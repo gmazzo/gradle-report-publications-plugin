@@ -1,4 +1,4 @@
-package io.github.gmazzo.gradle.publications.report
+package io.github.gmazzo.publications.report
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.MapProperty

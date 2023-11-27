@@ -1,5 +1,5 @@
 plugins {
-    id("io.github.gmazzo.gradle.publications.report")
+    id("io.github.gmazzo.publications.report")
     `maven-publish`
 }
 

@@ -1,4 +1,4 @@
-package io.github.gmazzo.gradle.publications.report
+package io.github.gmazzo.publications.report
 
 data class ReportPublication(
     val group: String,

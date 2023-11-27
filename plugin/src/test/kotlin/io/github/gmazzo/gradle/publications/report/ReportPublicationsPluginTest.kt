@@ -3,6 +3,7 @@
  */
 package io.github.gmazzo.gradle.publications.report
 
+import io.github.gmazzo.publications.report.ReportPublicationsPlugin
 import org.gradle.kotlin.dsl.apply
 import org.gradle.testfixtures.ProjectBuilder
 import kotlin.test.Test
