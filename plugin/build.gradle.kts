@@ -40,3 +40,7 @@ tasks.publish {
 testing.suites.withType<JvmTestSuite> {
     useKotlinTest()
 }
+
+tasks.test {
+    systemProperty("projectRootDir", temporaryDir)
+}
