@@ -5,6 +5,8 @@ package io.github.gmazzo.gradle.publications.report
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.invocation.Gradle
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
 import org.gradle.api.publish.maven.tasks.PublishToMavenLocal
 import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
@@ -17,19 +19,27 @@ import java.util.TreeSet
 class ReportPublicationsPlugin : Plugin<Project> {
 
     override fun apply(project: Project): Unit = with(project) {
-        val publishTasks = objects.setProperty<AbstractPublishToMaven>()
+        val publishTasks = with(gradle.rootBuild().extensions) {
+            @Suppress("UNCHECKED_CAST")
+            findByName("reportPublications") as SetProperty<AbstractPublishToMaven>?
+                ?: objects.setProperty<AbstractPublishToMaven>().also { add("reportPublications", it) }
+        }
+
+        val reportTask =
+            if (gradle.parent == null) tasks.register<ReportPublicationsTask>("reportPublications") {
+                notCompatibleWithConfigurationCache("not meant to be cached")
+                mustRunAfter(publishTasks)
+                publications.value(publishTasks.map(::collectPublications)).disallowChanges()
+            }
+            else null
 
         allprojects {
             tasks.withType<AbstractPublishToMaven>().configureEach {
                 publishTasks.add(this)
+                if (reportTask != null) finalizedBy(reportTask)
             }
         }
 
-        tasks.register<ReportPublicationsTask>("reportPublications") {
-            notCompatibleWithConfigurationCache("not meant to be cached")
-            mustRunAfter(publishTasks)
-            publications.value(publishTasks.map(::collectPublications)).disallowChanges()
-        }
     }
 
     private fun collectPublications(publishTasks: Set<AbstractPublishToMaven>): Map<ReportPublication.Repository, Set<ReportPublication>> {
@@ -44,8 +54,16 @@ class ReportPublicationsPlugin : Plugin<Project> {
                 artifact = task.publication.artifactId,
                 version = task.publication.version,
                 repository = when (task) {
-                    is PublishToMavenLocal -> ReportPublication.Repository(name = "mavenLocal", value = "~/.m2/repository")
-                    is PublishToMavenRepository -> ReportPublication.Repository(name = task.repository.name, task.repository.url.toString())
+                    is PublishToMavenLocal -> ReportPublication.Repository(
+                        name = "mavenLocal",
+                        value = "~/.m2/repository"
+                    )
+
+                    is PublishToMavenRepository -> ReportPublication.Repository(
+                        name = task.repository.name,
+                        task.repository.url.toString()
+                    )
+
                     else -> ReportPublication.Repository(name = "<unknown>", value = "")
                 },
                 outcome = when {
@@ -61,6 +79,11 @@ class ReportPublicationsPlugin : Plugin<Project> {
             }
         }
         return publications
+    }
+
+    private tailrec fun Gradle.rootBuild(): Gradle = when (val parent = parent) {
+        null -> this
+        else -> parent.rootBuild()
     }
 
 }

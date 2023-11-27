@@ -29,10 +29,10 @@ internal abstract class ReportPublicationsTask @Inject constructor(
         val failure = withStyle(StyledTextOutput.Style.Failure)
 
         publications.get().forEach { (repository, publications) ->
-            text("The following artifacts are available at ")
+            text("The following artifacts were published to ")
             header.text(repository.name)
             if (repository.value.isNotBlank()) {
-                text(" (")
+                text("(")
                 description.text(repository.value)
                 text(")")
             }

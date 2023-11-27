@@ -14,9 +14,17 @@ allprojects {
         publications.create<MavenPublication>("java") { from(components["java"]) }
         repositories {
             maven {
-                name = "local"
+                name = "myRepo"
                 url = uri(rootProject.layout.buildDirectory.dir("repo"))
             }
         }
     }
+}
+
+tasks.publish {
+    subprojects { this@publish.dependsOn(tasks.publish) }
+}
+
+tasks.publishToMavenLocal {
+    subprojects { this@publishToMavenLocal.dependsOn(tasks.publishToMavenLocal) }
 }

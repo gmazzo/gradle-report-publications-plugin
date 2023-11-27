@@ -14,9 +14,13 @@ allprojects {
         publications.create<MavenPublication>("java") { from(components["java"]) }
         repositories {
             maven {
-                name = "local"
+                name = "myRepo"
                 url = uri(rootProject.layout.buildDirectory.dir("repo"))
             }
         }
     }
 }
+
+val buildLogic = gradle.includedBuild("build-logic")
+tasks.publish { dependsOn(buildLogic.task(":$name")) }
+tasks.publishToMavenLocal { dependsOn(buildLogic.task(":$name")) }
