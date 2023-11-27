@@ -44,7 +44,7 @@ internal abstract class ReportPublicationsTask @Inject constructor(
                 text(":${it.artifact}:")
                 info.text(it.version)
                 if (it.outcome != ReportPublication.Outcome.Published) {
-                    failure.text(" (${it.outcome})")
+                    failure.text(" (${it.outcome.text})")
                 }
                 println()
             }

@@ -22,7 +22,7 @@ gradlePlugin {
             id = "io.github.gmazzo.publications.report"
             displayName = name
             implementationClass = "io.github.gmazzo.publications.report.ReportPublicationsPlugin"
-            description = "Prints out the maven coordinates after publishing with `publish` or `publishToMavenLocal`"
+            description = "Decorates the build logs with maven coordinates of artifacts published with `publish` or `publishToMavenLocal`"
             tags.addAll("maven", "gradle", "publication", "maven-publish", "report")
         }
     }

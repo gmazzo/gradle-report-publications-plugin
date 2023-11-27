@@ -10,6 +10,12 @@ data class ReportPublication(
 
     data class Repository(val name: String, val value: String)
 
-    enum class Outcome { Published, Failed, Skipped, Unknown }
+    enum class Outcome(text: String? = null) {
+
+        Published, Failed, Skipped, NotRun("not-run"), Unknown;
+
+       val text: String = text ?: name.lowercase()
+
+    }
 
 }

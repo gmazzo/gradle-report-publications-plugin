@@ -25,18 +25,16 @@ class ReportPublicationsPlugin : Plugin<Project> {
                 ?: objects.setProperty<AbstractPublishToMaven>().also { add("reportPublications", it) }
         }
 
-        val reportTask =
-            if (gradle.parent == null) tasks.register<ReportPublicationsTask>("reportPublications") {
-                notCompatibleWithConfigurationCache("not meant to be cached")
-                mustRunAfter(publishTasks)
-                publications.value(publishTasks.map(::collectPublications)).disallowChanges()
-            }
-            else null
+        val publishTask = if (gradle.parent == null) tasks.register<ReportPublicationsTask>("reportPublications") task@{
+            notCompatibleWithConfigurationCache("not meant to be cached")
+            mustRunAfter(publishTasks)
+            publications.value(publishTasks.map(::collectPublications)).disallowChanges()
+        } else null
 
         allprojects {
             tasks.withType<AbstractPublishToMaven>().configureEach {
                 publishTasks.add(this)
-                if (reportTask != null) finalizedBy(reportTask)
+                publishTask?.let { finalizedBy(it) }
             }
         }
 
@@ -69,7 +67,8 @@ class ReportPublicationsPlugin : Plugin<Project> {
                 outcome = when {
                     task.state.didWork -> ReportPublication.Outcome.Published
                     task.state.failure != null -> ReportPublication.Outcome.Failed
-                    task.state.skipped || task.state.executed -> ReportPublication.Outcome.Skipped
+                    task.state.skipped -> ReportPublication.Outcome.Skipped
+                    !task.state.executed -> ReportPublication.Outcome.NotRun
                     else -> ReportPublication.Outcome.Unknown
                 }
             )
