@@ -22,7 +22,8 @@ class ReportPublicationsPluginTest {
         assertEquals(null, result.task(":publishToMavenLocal")?.outcome)
         assertEquals(TaskOutcome.SUCCESS, result.task(":reportPublications")?.outcome)
 
-        assertEquals("""
+        assertEquals(
+            """
             > Task :reportPublications
             The following artifacts were published to myRepo(file:$rootDir/publish/build-logic/build/repo/):
              - io.gmazzo.demo.build-logic:build-logic:0.1.0
@@ -31,7 +32,8 @@ class ReportPublicationsPluginTest {
              - io.gmazzo.demo:demo:0.1.0
              - io.gmazzo.demo:module1:0.1.0
              - io.gmazzo.demo:module2:0.1.0
-        """.trimIndent(), result.reportPublicationsOutput)
+        """.trimIndent(), result.reportPublicationsOutput
+        )
     }
 
     @Test
@@ -42,7 +44,8 @@ class ReportPublicationsPluginTest {
         assertEquals(TaskOutcome.SUCCESS, result.task(":publishToMavenLocal")?.outcome)
         assertEquals(TaskOutcome.SUCCESS, result.task(":reportPublications")?.outcome)
 
-        assertEquals("""
+        assertEquals(
+            """
             > Task :reportPublications
             The following artifacts were published to mavenLocal(~/.m2/repository):
              - io.gmazzo.demo:demo:0.1.0
@@ -50,7 +53,8 @@ class ReportPublicationsPluginTest {
              - io.gmazzo.demo:module2:0.1.0
              - io.gmazzo.demo.build-logic:build-logic:0.1.0
              - io.gmazzo.demo.build-logic:otherModule:0.1.0
-        """.trimIndent(), result.reportPublicationsOutput)
+        """.trimIndent(), result.reportPublicationsOutput
+        )
     }
 
     @Test
@@ -61,7 +65,8 @@ class ReportPublicationsPluginTest {
         assertEquals(TaskOutcome.SUCCESS, result.task(":publishToMavenLocal")?.outcome)
         assertEquals(TaskOutcome.SUCCESS, result.task(":reportPublications")?.outcome)
 
-        assertEquals("""
+        assertEquals(
+            """
             > Task :reportPublications
             The following artifacts were published to myRepo(file:$rootDir/publish-publishToMavenLocal/build-logic/build/repo/):
              - io.gmazzo.demo.build-logic:build-logic:0.1.0
@@ -76,7 +81,8 @@ class ReportPublicationsPluginTest {
              - io.gmazzo.demo:module2:0.1.0
              - io.gmazzo.demo.build-logic:build-logic:0.1.0
              - io.gmazzo.demo.build-logic:otherModule:0.1.0
-        """.trimIndent(), result.reportPublicationsOutput)
+        """.trimIndent(), result.reportPublicationsOutput
+        )
     }
 
     private fun buildTest(vararg tasks: String): BuildResult {
@@ -99,6 +105,7 @@ class ReportPublicationsPluginTest {
         return GradleRunner.create()
             .withProjectDir(rootDir)
             .withPluginClasspath()
+            .withJaCoCo()
             .withArguments(*tasks)
             .forwardOutput()
             .build()
@@ -108,5 +115,11 @@ class ReportPublicationsPluginTest {
         get() = "(> Task :reportPublications.*?)\\s*(?=> Task :)"
             .toRegex(RegexOption.DOT_MATCHES_ALL)
             .find(output)?.groupValues?.get(1)
+
+    private fun GradleRunner.withJaCoCo() = apply {
+        File(projectDir, "gradle.properties")
+            .outputStream()
+            .use(javaClass.classLoader.getResourceAsStream("testkit-gradle.properties")::copyTo)
+    }
 
 }

@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.samReceiver)
     alias(libs.plugins.gradle.pluginPublish)
+    alias(libs.plugins.testkit.jacoco)
 }
 
 group = "io.github.gmazzo.publications.report"
@@ -43,4 +44,9 @@ testing.suites.withType<JvmTestSuite> {
 
 tasks.test {
     systemProperty("projectRootDir", temporaryDir)
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    reports.xml.required = true
 }
