@@ -1,3 +1,5 @@
+import java.lang.Thread.sleep
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.samReceiver)
@@ -24,7 +26,7 @@ gradlePlugin {
             displayName = name
             implementationClass = "io.github.gmazzo.publications.report.ReportPublicationsPlugin"
             description = "Decorates the build logs with maven coordinates of artifacts published with `publish` or `publishToMavenLocal`"
-            tags.addAll("maven", "gradle", "publication", "maven-publish", "report")
+            tags.addAll("maven", "publication", "maven-publish", "report")
         }
     }
 }
@@ -45,6 +47,7 @@ testing.suites.withType<JvmTestSuite> {
 tasks.test {
     systemProperty("projectRootDir", temporaryDir)
     finalizedBy(tasks.jacocoTestReport)
+    doLast { sleep(1000) }
 }
 
 tasks.jacocoTestReport {
