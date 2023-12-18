@@ -26,12 +26,12 @@ class ReportPublicationsPluginTest {
             """
             > Task :reportPublications
             The following artifacts were published to myRepo(file:$rootDir/publish/build-logic/build/repo/):
-             - io.gmazzo.demo.build-logic:build-logic:0.1.0
-             - io.gmazzo.demo.build-logic:otherModule:0.1.0
+             - io.gmazzo.demo.build-logic:build-logic:0.1.0 jar
+             - io.gmazzo.demo.build-logic:otherModule:0.1.0 jar
             The following artifacts were published to myRepo(file:$rootDir/publish/build/repo/):
-             - io.gmazzo.demo:demo:0.1.0
-             - io.gmazzo.demo:module1:0.1.0
-             - io.gmazzo.demo:module2:0.1.0
+             - io.gmazzo.demo:demo:0.1.0 jar
+             - io.gmazzo.demo:module1:0.1.0 jar
+             - io.gmazzo.demo:module2:0.1.0 jar
         """.trimIndent(), result.reportPublicationsOutput
         )
     }
@@ -48,11 +48,11 @@ class ReportPublicationsPluginTest {
             """
             > Task :reportPublications
             The following artifacts were published to mavenLocal(~/.m2/repository):
-             - io.gmazzo.demo:demo:0.1.0
-             - io.gmazzo.demo:module1:0.1.0
-             - io.gmazzo.demo:module2:0.1.0
-             - io.gmazzo.demo.build-logic:build-logic:0.1.0
-             - io.gmazzo.demo.build-logic:otherModule:0.1.0
+             - io.gmazzo.demo:demo:0.1.0 jar
+             - io.gmazzo.demo:module1:0.1.0 jar
+             - io.gmazzo.demo:module2:0.1.0 jar
+             - io.gmazzo.demo.build-logic:build-logic:0.1.0 jar
+             - io.gmazzo.demo.build-logic:otherModule:0.1.0 jar
         """.trimIndent(), result.reportPublicationsOutput
         )
     }
@@ -69,18 +69,18 @@ class ReportPublicationsPluginTest {
             """
             > Task :reportPublications
             The following artifacts were published to myRepo(file:$rootDir/publish-publishToMavenLocal/build-logic/build/repo/):
-             - io.gmazzo.demo.build-logic:build-logic:0.1.0
-             - io.gmazzo.demo.build-logic:otherModule:0.1.0
+             - io.gmazzo.demo.build-logic:build-logic:0.1.0 jar
+             - io.gmazzo.demo.build-logic:otherModule:0.1.0 jar
             The following artifacts were published to myRepo(file:$rootDir/publish-publishToMavenLocal/build/repo/):
-             - io.gmazzo.demo:demo:0.1.0
-             - io.gmazzo.demo:module1:0.1.0
-             - io.gmazzo.demo:module2:0.1.0
+             - io.gmazzo.demo:demo:0.1.0 jar
+             - io.gmazzo.demo:module1:0.1.0 jar
+             - io.gmazzo.demo:module2:0.1.0 jar
             The following artifacts were published to mavenLocal(~/.m2/repository):
-             - io.gmazzo.demo:demo:0.1.0
-             - io.gmazzo.demo:module1:0.1.0
-             - io.gmazzo.demo:module2:0.1.0
-             - io.gmazzo.demo.build-logic:build-logic:0.1.0
-             - io.gmazzo.demo.build-logic:otherModule:0.1.0
+             - io.gmazzo.demo:demo:0.1.0 jar
+             - io.gmazzo.demo:module1:0.1.0 jar
+             - io.gmazzo.demo:module2:0.1.0 jar
+             - io.gmazzo.demo.build-logic:build-logic:0.1.0 jar
+             - io.gmazzo.demo.build-logic:otherModule:0.1.0 jar
         """.trimIndent(), result.reportPublicationsOutput
         )
     }
