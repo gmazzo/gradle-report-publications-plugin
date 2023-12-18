@@ -7,4 +7,4 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-samReceiver = { id = "org.jetbrains.kotlin.plugin.sam.with.receiver", version.ref = "kotlin" }
 gradle-pluginPublish = { id = "com.gradle.plugin-publish", version = "1.2.1" }
 testkit-jacoco = { id = "pl.droidsonroids.jacoco.testkit", version = "1.0.12" }
-publicationsReport = { id = "io.github.gmazzo.publications.report", version = "1.0.0" }
+publicationsReport = { id = "io.github.gmazzo.publications.report", version = "1.1.0" }
