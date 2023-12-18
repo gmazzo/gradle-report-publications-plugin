@@ -27,6 +27,7 @@ internal abstract class ReportPublicationsTask @Inject constructor(
         val identifier = withStyle(StyledTextOutput.Style.Identifier)
         val info = withStyle(StyledTextOutput.Style.Info)
         val failure = withStyle(StyledTextOutput.Style.Failure)
+        val failureHeader = withStyle(StyledTextOutput.Style.FailureHeader)
 
         publications.get().forEach { (repository, publications) ->
             text("The following artifacts were published to ")
@@ -40,11 +41,12 @@ internal abstract class ReportPublicationsTask @Inject constructor(
 
             publications.forEach {
                 text(" - ")
-                identifier.text(it.group)
-                text(":${it.artifact}:")
+                identifier.text(it.groupId)
+                text(":${it.artifactId}:")
                 info.text(it.version)
+                failure.text(it.artifacts.joinToString(prefix = " ", separator = " "))
                 if (it.outcome != ReportPublication.Outcome.Published) {
-                    failure.text(" (${it.outcome.text})")
+                    failureHeader.text(" (${it.outcome.text})")
                 }
                 println()
             }

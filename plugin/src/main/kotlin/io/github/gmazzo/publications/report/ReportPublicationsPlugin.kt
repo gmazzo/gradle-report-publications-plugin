@@ -7,6 +7,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.invocation.Gradle
 import org.gradle.api.provider.SetProperty
+import org.gradle.api.publish.maven.MavenArtifact
 import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
 import org.gradle.api.publish.maven.tasks.PublishToMavenLocal
 import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
@@ -44,12 +45,12 @@ class ReportPublicationsPlugin : Plugin<Project> {
         val publications =
             TreeMap<ReportPublication.Repository, TreeSet<ReportPublication>>(compareBy(ReportPublication.Repository::value))
         val publicationsComparator =
-            compareBy(ReportPublication::group, ReportPublication::artifact, ReportPublication::version)
+            compareBy(ReportPublication::groupId, ReportPublication::artifactId, ReportPublication::version)
 
         publishTasks.forEach { task ->
             val publication = ReportPublication(
-                group = task.publication.groupId,
-                artifact = task.publication.artifactId,
+                groupId = task.publication.groupId,
+                artifactId = task.publication.artifactId,
                 version = task.publication.version,
                 repository = when (task) {
                     is PublishToMavenLocal -> ReportPublication.Repository(
@@ -70,7 +71,13 @@ class ReportPublicationsPlugin : Plugin<Project> {
                     task.state.skipped -> ReportPublication.Outcome.Skipped
                     !task.state.executed -> ReportPublication.Outcome.NotRun
                     else -> ReportPublication.Outcome.Unknown
-                }
+                },
+                artifacts = task.publication.artifacts.sortedWith(compareBy(MavenArtifact::getClassifier)) .map {
+                    when (val clasiffier = it.classifier) {
+                        null -> it.extension
+                        else -> "$clasiffier.${it.extension}"
+                    }
+                }.ifEmpty { listOf("pom") }
             )
 
             publications.compute(publication.repository) { _, set ->

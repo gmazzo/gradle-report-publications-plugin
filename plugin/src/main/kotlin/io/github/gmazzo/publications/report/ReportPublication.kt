@@ -1,11 +1,12 @@
 package io.github.gmazzo.publications.report
 
 data class ReportPublication(
-    val group: String,
-    val artifact: String,
+    val groupId: String,
+    val artifactId: String,
     val version: String,
     val repository: Repository,
     val outcome: Outcome,
+    val artifacts: List<String>,
 ) {
 
     data class Repository(val name: String, val value: String)
