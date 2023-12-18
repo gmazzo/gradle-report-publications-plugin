@@ -1,6 +1,6 @@
 ![GitHub](https://img.shields.io/github/license/gmazzo/gradle-report-publications-plugin)
 [![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/io.github.gmazzo.publications.report)](https://plugins.gradle.org/plugin/io.github.gmazzo.publications.report)
-![Build Status](https://github.com/gmazzo/gradle-report-publications-plugin/actions/workflows/build.yaml/badge.svg)
+[![Build Status](https://github.com/gmazzo/gradle-report-publications-plugin/actions/workflows/build.yaml/badge.svg)](https://github.com/gmazzo/gradle-report-publications-plugin/actions/workflows/build.yaml)
 [![Coverage](https://codecov.io/gh/gmazzo/gradle-report-publications-plugin/branch/main/graph/badge.svg?token=D5cDiPWvcS)](https://codecov.io/gh/gmazzo/gradle-report-publications-plugin)
 
 # gradle-report-publications-plugin
