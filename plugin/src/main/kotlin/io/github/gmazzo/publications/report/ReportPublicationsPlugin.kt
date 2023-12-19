@@ -3,8 +3,8 @@
  */
 package io.github.gmazzo.publications.report
 
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import io.github.gmazzo.publications.report.ReportPublicationSerializer.deserialize
+import io.github.gmazzo.publications.report.ReportPublicationSerializer.serialize
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.flow.FlowProviders
@@ -37,25 +37,27 @@ class ReportPublicationsPlugin @Inject constructor(
         }
 
         val service = gradle.sharedServices.registerIfAbsent("publicationsReport", ReportPublicationsService::class) {}
-        val publications = gradle.rootBuild().createMapProperty("publicationsReport")
+        val publications = with(gradle.rootBuild().extensions) {
+            findByName("publicationsReport") as MapProperty<String, ByteArray>?
+                ?: rootProject.objects.mapProperty<String, ByteArray>().also { add("publicationsReport", it) }
+        }
 
         buildEventsListenerRegistry.onTaskCompletion(service)
 
         if (gradle.parent == null) {
             flowScope.always(ReportPublicationsFlowAction::class) {
                 parameters.publications.set(flowProviders.buildWorkResult.zip(publications) { _, publications ->
-                    publications.mapValues { (_, it) -> Json.decodeFromString<ReportPublication>(it) }
+                    publications.mapValues { (_, it) -> deserialize(it) }
                 })
                 parameters.outcomes.set(flowProviders.buildWorkResult.zip(service) { _, it -> it.tasksOutcome })
             }
         }
 
-        allprojects {
-            val buildPath = gradle.path
-
+        val buildPath = gradle.path
+        gradle.allprojects {
             tasks.withType<AbstractPublishToMaven>().configureEach {
                 publications.putAll(tasks.named<AbstractPublishToMaven>(this@configureEach.name)
-                    .map { mapOf( buildPath + it.path to Json.encodeToString(resolvePublication(it))) })
+                    .map { mapOf( buildPath + it.path to serialize(resolvePublication(it))) })
             }
         }
     }
@@ -102,11 +104,5 @@ class ReportPublicationsPlugin @Inject constructor(
             null -> ""
             else -> "${parent.path}:${rootProject.name}"
         }
-
-    @Suppress("UNCHECKED_CAST")
-    private fun Gradle.createMapProperty(name: String) = with(extensions) {
-        findByName(name) as MapProperty<String, String>?
-            ?: rootProject.objects.mapProperty<String, String>().also { add(name, it) }
-    }
 
 }
