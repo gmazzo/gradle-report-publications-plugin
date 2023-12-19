@@ -18,14 +18,14 @@ Then, whenever you call Maven Publish task (usually `publish` or `publishToMaven
 
 For instance, the `demo` project will print for `publishToMavenLocal`:
 ```
-❯ ./gradlew publishToMavenLocal
-> Task :demo:reportPublications
+> Task :publishToMavenLocal
+
 The following artifacts were published to mavenLocal(~/.m2/repository):
- - io.gmazzo.demo:demo:0.1.0
- - io.gmazzo.demo:module1:0.1.0
- - io.gmazzo.demo:module2:0.1.0
- - io.gmazzo.demo.build-logic:build-logic:0.1.0
- - io.gmazzo.demo.build-logic:otherModule:0.1.0
+ - io.gmazzo.demo:demo:0.1.0 jar
+ - io.gmazzo.demo:module1:0.1.0 jar
+ - io.gmazzo.demo:module2:0.1.0 jar
+ - io.gmazzo.demo.build-logic:build-logic:0.1.0 jar
+ - io.gmazzo.demo.build-logic:otherModule:0.1.0 jar
 ```
 ![`./gradlew publishToMavenLocal` output example](README-example-output.png)
 > [!NOTE]
