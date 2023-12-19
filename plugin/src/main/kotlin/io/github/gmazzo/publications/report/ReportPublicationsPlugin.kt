@@ -3,93 +3,110 @@
  */
 package io.github.gmazzo.publications.report
 
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.flow.FlowProviders
+import org.gradle.api.flow.FlowScope
 import org.gradle.api.invocation.Gradle
-import org.gradle.api.provider.SetProperty
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.publish.maven.MavenArtifact
 import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
 import org.gradle.api.publish.maven.tasks.PublishToMavenLocal
 import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
-import org.gradle.kotlin.dsl.register
-import org.gradle.kotlin.dsl.setProperty
+import org.gradle.build.event.BuildEventsListenerRegistry
+import org.gradle.kotlin.dsl.always
+import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.mapProperty
+import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.registerIfAbsent
 import org.gradle.kotlin.dsl.withType
-import java.util.TreeMap
-import java.util.TreeSet
+import javax.inject.Inject
 
-class ReportPublicationsPlugin : Plugin<Project> {
+class ReportPublicationsPlugin @Inject constructor(
+    private val buildEventsListenerRegistry: BuildEventsListenerRegistry,
+    private val flowScope: FlowScope,
+    private val flowProviders: FlowProviders,
+) : Plugin<Project> {
 
     override fun apply(project: Project): Unit = with(project) {
-        val publishTasks = with(gradle.rootBuild().extensions) {
-            @Suppress("UNCHECKED_CAST")
-            findByName("reportPublications") as SetProperty<AbstractPublishToMaven>?
-                ?: objects.setProperty<AbstractPublishToMaven>().also { add("reportPublications", it) }
+        if (project != rootProject) {
+            rootProject.apply<ReportPublicationsPlugin>()
+            return
         }
 
-        val publishTask = if (gradle.parent == null) tasks.register<ReportPublicationsTask>("reportPublications") task@{
-            notCompatibleWithConfigurationCache("not meant to be cached")
-            mustRunAfter(publishTasks)
-            publications.value(publishTasks.map(::collectPublications)).disallowChanges()
-        } else null
+        val service = gradle.sharedServices.registerIfAbsent("publicationsReport", ReportPublicationsService::class) {}
+        val publications = gradle.rootBuild().createMapProperty("publicationsReport")
+
+        buildEventsListenerRegistry.onTaskCompletion(service)
+
+        if (gradle.parent == null) {
+            flowScope.always(ReportPublicationsFlowAction::class) {
+                parameters.publications.set(flowProviders.buildWorkResult.zip(publications) { _, publications ->
+                    publications.mapValues { (_, it) -> Json.decodeFromString<ReportPublication>(it) }
+                })
+                parameters.outcomes.set(flowProviders.buildWorkResult.zip(service) { _, it -> it.tasksOutcome })
+            }
+        }
 
         allprojects {
+            val buildPath = gradle.path
+
             tasks.withType<AbstractPublishToMaven>().configureEach {
-                publishTasks.add(this)
-                publishTask?.let { finalizedBy(it) }
+                publications.putAll(tasks.named<AbstractPublishToMaven>(this@configureEach.name)
+                    .map { mapOf( buildPath + it.path to Json.encodeToString(resolvePublication(it))) })
             }
         }
-
     }
 
-    private fun collectPublications(publishTasks: Set<AbstractPublishToMaven>): Map<ReportPublication.Repository, Set<ReportPublication>> {
-        val publications =
-            TreeMap<ReportPublication.Repository, TreeSet<ReportPublication>>(compareBy(ReportPublication.Repository::value))
-        val publicationsComparator =
-            compareBy(ReportPublication::groupId, ReportPublication::artifactId, ReportPublication::version)
-
-        publishTasks.forEach { task ->
-            val publication = ReportPublication(
-                groupId = task.publication.groupId,
-                artifactId = task.publication.artifactId,
-                version = task.publication.version,
-                repository = when (task) {
-                    is PublishToMavenLocal -> ReportPublication.Repository(
-                        name = "mavenLocal",
-                        value = "~/.m2/repository"
-                    )
-
-                    is PublishToMavenRepository -> ReportPublication.Repository(
-                        name = task.repository.name,
-                        task.repository.url.toString()
-                    )
-
-                    else -> ReportPublication.Repository(name = "<unknown>", value = "")
-                },
-                outcome = when {
-                    task.state.didWork -> ReportPublication.Outcome.Published
-                    task.state.failure != null -> ReportPublication.Outcome.Failed
-                    task.state.skipped -> ReportPublication.Outcome.Skipped
-                    !task.state.executed -> ReportPublication.Outcome.NotRun
-                    else -> ReportPublication.Outcome.Unknown
-                },
-                artifacts = task.publication.artifacts.sortedWith(compareBy(MavenArtifact::getClassifier)) .map {
-                    when (val clasiffier = it.classifier) {
-                        null -> it.extension
-                        else -> "$clasiffier.${it.extension}"
-                    }
-                }.ifEmpty { listOf("pom") }
+    private fun resolvePublication(task: AbstractPublishToMaven): ReportPublication {
+        val repository = when (task) {
+            is PublishToMavenLocal -> ReportPublication.Repository(
+                name = "mavenLocal",
+                value = "~/.m2/repository"
             )
 
-            publications.compute(publication.repository) { _, set ->
-                (set ?: TreeSet(publicationsComparator)).apply { add(publication) }
-            }
+            is PublishToMavenRepository -> ReportPublication.Repository(
+                name = task.repository.name,
+                task.repository.url.toString()
+            )
+
+            else -> ReportPublication.Repository(name = "<unknown>", value = "")
         }
-        return publications
+        val artifacts = task.publication.artifacts.sortedWith(compareBy(MavenArtifact::getClassifier)).map {
+            when (val classifier = it.classifier) {
+                null -> it.extension
+                else -> "$classifier.${it.extension}"
+            }
+        }.ifEmpty { listOf("pom") }
+
+        return ReportPublication(
+            groupId = task.publication.groupId,
+            artifactId = task.publication.artifactId,
+            version = task.publication.version,
+            repository = repository,
+            outcome = ReportPublication.Outcome.NotRun,
+            artifacts = artifacts
+        )
     }
 
     private tailrec fun Gradle.rootBuild(): Gradle = when (val parent = parent) {
         null -> this
         else -> parent.rootBuild()
+    }
+
+    @Suppress("RecursivePropertyAccessor")
+    private val Gradle.path: String
+        get() = when (val parent = parent) {
+            null -> ""
+            else -> "${parent.path}:${rootProject.name}"
+        }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun Gradle.createMapProperty(name: String) = with(extensions) {
+        findByName(name) as MapProperty<String, String>?
+            ?: rootProject.objects.mapProperty<String, String>().also { add(name, it) }
     }
 
 }

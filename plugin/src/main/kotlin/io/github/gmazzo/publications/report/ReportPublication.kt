@@ -1,5 +1,8 @@
 package io.github.gmazzo.publications.report
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class ReportPublication(
     val groupId: String,
     val artifactId: String,
@@ -9,6 +12,7 @@ data class ReportPublication(
     val artifacts: List<String>,
 ) {
 
+    @Serializable
     data class Repository(val name: String, val value: String)
 
     enum class Outcome(text: String? = null) {

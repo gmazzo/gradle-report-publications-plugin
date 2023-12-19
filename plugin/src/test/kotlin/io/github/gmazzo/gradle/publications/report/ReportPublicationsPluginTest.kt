@@ -20,11 +20,9 @@ class ReportPublicationsPluginTest {
 
         assertEquals(TaskOutcome.SUCCESS, result.task(":publish")?.outcome)
         assertEquals(null, result.task(":publishToMavenLocal")?.outcome)
-        assertEquals(TaskOutcome.SUCCESS, result.task(":reportPublications")?.outcome)
 
         assertEquals(
             """
-            > Task :reportPublications
             The following artifacts were published to myRepo(file:$rootDir/publish/build-logic/build/repo/):
              - io.gmazzo.demo.build-logic:build-logic:0.1.0 jar
              - io.gmazzo.demo.build-logic:otherModule:0.1.0 jar
@@ -42,11 +40,9 @@ class ReportPublicationsPluginTest {
 
         assertEquals(null, result.task(":publish")?.outcome)
         assertEquals(TaskOutcome.SUCCESS, result.task(":publishToMavenLocal")?.outcome)
-        assertEquals(TaskOutcome.SUCCESS, result.task(":reportPublications")?.outcome)
 
         assertEquals(
             """
-            > Task :reportPublications
             The following artifacts were published to mavenLocal(~/.m2/repository):
              - io.gmazzo.demo:demo:0.1.0 jar
              - io.gmazzo.demo:module1:0.1.0 jar
@@ -63,11 +59,9 @@ class ReportPublicationsPluginTest {
 
         assertEquals(TaskOutcome.SUCCESS, result.task(":publish")?.outcome)
         assertEquals(TaskOutcome.SUCCESS, result.task(":publishToMavenLocal")?.outcome)
-        assertEquals(TaskOutcome.SUCCESS, result.task(":reportPublications")?.outcome)
 
         assertEquals(
             """
-            > Task :reportPublications
             The following artifacts were published to myRepo(file:$rootDir/publish-publishToMavenLocal/build-logic/build/repo/):
              - io.gmazzo.demo.build-logic:build-logic:0.1.0 jar
              - io.gmazzo.demo.build-logic:otherModule:0.1.0 jar
@@ -112,7 +106,7 @@ class ReportPublicationsPluginTest {
     }
 
     private val BuildResult.reportPublicationsOutput
-        get() = "(> Task :reportPublications.*?)\\s*(?=> Task :)"
+        get() = "(The following artifacts were published.*?)\\s*(?=BUILD SUCCESSFUL)"
             .toRegex(RegexOption.DOT_MATCHES_ALL)
             .find(output)?.groupValues?.get(1)
 
