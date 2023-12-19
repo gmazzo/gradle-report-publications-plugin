@@ -9,6 +9,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.flow.FlowProviders
 import org.gradle.api.flow.FlowScope
+import org.gradle.api.internal.GradleInternal
 import org.gradle.api.invocation.Gradle
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.publish.maven.MavenArtifact
@@ -102,7 +103,7 @@ class ReportPublicationsPlugin @Inject constructor(
     private val Gradle.path: String
         get() = when (val parent = parent) {
             null -> ""
-            else -> "${parent.path}:${rootProject.name}"
+            else -> "${parent.path}${(this as GradleInternal).identityPath}"
         }
 
 }
