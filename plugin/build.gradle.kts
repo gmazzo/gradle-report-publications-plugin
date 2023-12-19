@@ -3,7 +3,6 @@ import java.lang.Thread.sleep
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.samReceiver)
-    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.gradle.pluginPublish)
     alias(libs.plugins.testkit.jacoco)
 }
@@ -34,7 +33,6 @@ gradlePlugin {
 
 dependencies {
     compileOnly(gradleKotlinDsl())
-    implementation(libs.serialization.json)
     testImplementation(gradleKotlinDsl())
 }
 
