@@ -59,7 +59,7 @@ abstract class ReportPublicationsFlowAction : FlowAction<ReportPublicationsFlowA
                 identifier.text(it.groupId)
                 text(":${it.artifactId}:")
                 info.text(it.version)
-                failure.text(it.artifacts.joinToString(prefix = " ", separator = " "))
+                failure.text(it.artifacts.joinToString(prefix = " [", separator = ", ", postfix = "]"))
                 if (it.outcome != ReportPublication.Outcome.Published) {
                     failureHeader.text(" (${it.outcome.text})")
                 }
