@@ -25,7 +25,7 @@ abstract class ReportPublicationsFlowAction : FlowAction<ReportPublicationsFlowA
         val outcomes = parameters.outcomes.get()
 
         parameters.publications.get().forEach { (path, pub) ->
-            val outcome = outcomes[path] ?: ReportPublication.Outcome.NotRun
+            val outcome = outcomes[path] ?: pub.outcome
 
             publications.compute(pub.repository) { _, set ->
                 (set ?: TreeSet(publicationsComparator)).apply { add(pub.copy(outcome = outcome)) }
@@ -61,7 +61,7 @@ abstract class ReportPublicationsFlowAction : FlowAction<ReportPublicationsFlowA
                 info.text(it.version)
                 failure.text(it.artifacts.joinToString(prefix = " [", separator = ", ", postfix = "]"))
                 if (it.outcome != ReportPublication.Outcome.Published) {
-                    failureHeader.text(" (${it.outcome.text})")
+                    failureHeader.text(" (${it.outcome.name.lowercase()})")
                 }
                 println()
             }

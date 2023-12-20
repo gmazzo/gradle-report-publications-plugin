@@ -7,11 +7,11 @@ import io.github.gmazzo.publications.report.ReportPublicationSerializer.deserial
 import io.github.gmazzo.publications.report.ReportPublicationSerializer.serialize
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.flow.FlowProviders
 import org.gradle.api.flow.FlowScope
 import org.gradle.api.internal.GradleInternal
 import org.gradle.api.invocation.Gradle
 import org.gradle.api.provider.MapProperty
+import org.gradle.api.provider.Provider
 import org.gradle.api.publish.maven.MavenArtifact
 import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
 import org.gradle.api.publish.maven.tasks.PublishToMavenLocal
@@ -20,15 +20,12 @@ import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.kotlin.dsl.always
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.mapProperty
-import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.registerIfAbsent
-import org.gradle.kotlin.dsl.withType
 import javax.inject.Inject
 
 class ReportPublicationsPlugin @Inject constructor(
     private val buildEventsListenerRegistry: BuildEventsListenerRegistry,
     private val flowScope: FlowScope,
-    private val flowProviders: FlowProviders,
 ) : Plugin<Project> {
 
     override fun apply(project: Project): Unit = with(project) {
@@ -37,30 +34,35 @@ class ReportPublicationsPlugin @Inject constructor(
             return
         }
 
-        val service = gradle.sharedServices.registerIfAbsent("publicationsReport", ReportPublicationsService::class) {}
-        val publications = with(gradle.rootBuild().extensions) {
-            findByName("publicationsReport") as MapProperty<String, ByteArray>?
-                ?: rootProject.objects.mapProperty<String, ByteArray>().also { add("publicationsReport", it) }
+        val publications = createPublicationsCollector()
+        val service = createCollectTaskOutcomeService()
+
+        collectPublishTasksPublications(publications)
+
+        if (gradle.parent == null) { // we only report at the root main build
+            registerPublicationsReporter(publications, service)
         }
+    }
 
-        buildEventsListenerRegistry.onTaskCompletion(service)
+    @Suppress("UNCHECKED_CAST")
+    private fun Project.createPublicationsCollector() = with(gradle.rootBuild().extensions) {
+        findByName("publicationsReport") as MapProperty<String, ByteArray>?
+            ?: rootProject.objects.mapProperty<String, ByteArray>().also { add("publicationsReport", it) }
+    }
 
-        if (gradle.parent == null) {
-            flowScope.always(ReportPublicationsFlowAction::class) {
-                parameters.publications.set(flowProviders.buildWorkResult.zip(publications) { _, publications ->
-                    publications.mapValues { (_, it) -> deserialize(it) }
-                })
-                parameters.outcomes.set(flowProviders.buildWorkResult.zip(service) { _, it -> it.tasksOutcome })
-            }
-        }
+    private fun Project.createCollectTaskOutcomeService() = gradle.sharedServices
+        .registerIfAbsent("publicationsReport", ReportPublicationsService::class) {}
+        .also(buildEventsListenerRegistry::onTaskCompletion)
 
+    private fun Project.collectPublishTasksPublications(publications: MapProperty<String, ByteArray>) {
         val buildPath = gradle.path
-        gradle.allprojects {
-            tasks.withType<AbstractPublishToMaven>().configureEach {
-                publications.putAll(tasks.named<AbstractPublishToMaven>(this@configureEach.name)
-                    .map { mapOf( buildPath + it.path to serialize(resolvePublication(it))) })
-            }
-        }
+
+        publications.putAll(provider {
+            gradle.taskGraph.allTasks.asSequence()
+                .filterIsInstance<AbstractPublishToMaven>()
+                .map { buildPath + it.path to serialize(resolvePublication(it)) }
+                .toMap()
+        })
     }
 
     private fun resolvePublication(task: AbstractPublishToMaven): ReportPublication {
@@ -89,9 +91,19 @@ class ReportPublicationsPlugin @Inject constructor(
             artifactId = task.publication.artifactId,
             version = task.publication.version,
             repository = repository,
-            outcome = ReportPublication.Outcome.NotRun,
+            outcome = ReportPublication.Outcome.Unknown,
             artifacts = artifacts
         )
+    }
+
+    private fun registerPublicationsReporter(
+        publications: MapProperty<String, ByteArray>,
+        service: Provider<ReportPublicationsService>,
+    ) {
+        flowScope.always(ReportPublicationsFlowAction::class) {
+            parameters.publications.set(publications.map { it.mapValues { (_, pub) -> deserialize(pub) } })
+            parameters.outcomes.set(service.map { it.tasksOutcome })
+        }
     }
 
     private tailrec fun Gradle.rootBuild(): Gradle = when (val parent = parent) {
