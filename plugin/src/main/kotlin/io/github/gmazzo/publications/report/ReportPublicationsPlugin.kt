@@ -69,7 +69,7 @@ class ReportPublicationsPlugin @Inject constructor(
         })
     }
 
-    private fun resolvePublication(task: AbstractPublishToMaven): ReportPublication {
+    private fun Project.resolvePublication(task: AbstractPublishToMaven): ReportPublication {
         val repository = when (task) {
             is PublishToMavenLocal -> ReportPublication.Repository(
                 name = "mavenLocal",
@@ -78,7 +78,7 @@ class ReportPublicationsPlugin @Inject constructor(
 
             is PublishToMavenRepository -> ReportPublication.Repository(
                 name = task.repository.name,
-                task.repository.url.toString()
+                value = task.repository.url.toString()
             )
 
             else -> ReportPublication.Repository(name = "<unknown>", value = "")
@@ -95,7 +95,7 @@ class ReportPublicationsPlugin @Inject constructor(
             artifactId = task.publication.artifactId,
             version = task.publication.version,
             repository = repository,
-            outcome = ReportPublication.Outcome.Unknown,
+            outcome = if (gradle.startParameter.isDryRun) ReportPublication.Outcome.Skipped else ReportPublication.Outcome.Unknown,
             artifacts = artifacts
         )
     }
