@@ -60,7 +60,11 @@ class ReportPublicationsPlugin @Inject constructor(
         publications.putAll(provider {
             gradle.taskGraph.allTasks.asSequence()
                 .filterIsInstance<AbstractPublishToMaven>()
-                .map { buildPath + it.path to serialize(resolvePublication(it)) }
+                .mapNotNull {
+                    runCatching { buildPath + it.path to serialize(resolvePublication(it)) }
+                        .onFailure { ex -> logger.warn("Failed to resolve publication for task ${it.path}", ex) }
+                        .getOrNull()
+                }
                 .toMap()
         })
     }
