@@ -10,6 +10,7 @@ import org.gradle.api.Project
 import org.gradle.api.flow.FlowScope
 import org.gradle.api.internal.GradleInternal
 import org.gradle.api.invocation.Gradle
+import org.gradle.api.logging.configuration.ShowStacktrace
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Provider
 import org.gradle.api.publish.maven.MavenArtifact
@@ -62,7 +63,11 @@ class ReportPublicationsPlugin @Inject constructor(
                 .filterIsInstance<AbstractPublishToMaven>()
                 .mapNotNull {
                     runCatching { buildPath + it.path to serialize(resolvePublication(it)) }
-                        .onFailure { ex -> logger.warn("Failed to resolve publication for task ${it.path}", ex) }
+                        .onFailure { ex ->
+                            logger.warn(
+                                "Failed to resolve publication for task ${it.path}",
+                                ex.takeIf { gradle.startParameter.showStacktrace == ShowStacktrace.ALWAYS })
+                        }
                         .getOrNull()
                 }
                 .toMap()
