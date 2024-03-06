@@ -58,8 +58,8 @@ class ReportPublicationsPlugin @Inject constructor(
     private fun Project.collectPublishTasksPublications(publications: MapProperty<String, ByteArray>) {
         val buildPath = gradle.path
 
-        publications.putAll(provider {
-            gradle.taskGraph.allTasks.asSequence()
+        gradle.taskGraph.whenReady {
+            publications.putAll(allTasks.asSequence()
                 .filterIsInstance<AbstractPublishToMaven>()
                 .mapNotNull {
                     runCatching { buildPath + it.path to serialize(resolvePublication(it)) }
@@ -70,8 +70,8 @@ class ReportPublicationsPlugin @Inject constructor(
                         }
                         .getOrNull()
                 }
-                .toMap()
-        })
+                .toMap())
+        }
     }
 
     private fun Project.resolvePublication(task: AbstractPublishToMaven): ReportPublication {
