@@ -59,18 +59,20 @@ class ReportPublicationsPlugin @Inject constructor(
         val buildPath = gradle.path
 
         gradle.taskGraph.whenReady {
-            publications.putAll(allTasks.asSequence()
-                .filterIsInstance<AbstractPublishToMaven>()
-                .mapNotNull {
-                    runCatching { buildPath + it.path to serialize(resolvePublication(it)) }
-                        .onFailure { ex ->
-                            logger.warn(
-                                "Failed to resolve publication for task ${it.path}",
-                                ex.takeIf { gradle.startParameter.showStacktrace == ShowStacktrace.ALWAYS })
-                        }
-                        .getOrNull()
-                }
-                .toMap())
+            publications.putAll(provider {
+                allTasks.asSequence()
+                    .filterIsInstance<AbstractPublishToMaven>()
+                    .mapNotNull {
+                        runCatching { buildPath + it.path to serialize(resolvePublication(it)) }
+                            .onFailure { ex ->
+                                logger.warn(
+                                    "Failed to resolve publication for task ${it.path}",
+                                    ex.takeIf { gradle.startParameter.showStacktrace == ShowStacktrace.ALWAYS })
+                            }
+                            .getOrNull()
+                    }
+                    .toMap()
+            })
         }
     }
 

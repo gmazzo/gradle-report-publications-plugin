@@ -15,7 +15,7 @@ allprojects {
         repositories {
             maven {
                 name = "myRepo"
-                url = uri(rootProject.layout.buildDirectory.dir("repo"))
+                url = rootProject.layout.buildDirectory.dir("repo").get().asFile.toURI()
             }
         }
     }
