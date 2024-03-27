@@ -3,16 +3,21 @@
  */
 package io.github.gmazzo.gradle.publications.report
 
+import io.github.gmazzo.publications.report.ReportPublicationsPlugin
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
+import org.gradle.util.GradleVersion
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class ReportPublicationsPluginTest {
+sealed class ReportPublicationsPluginTest(private val gradleVersion: String) {
 
-    private val rootDir = File(System.getProperty("projectRootDir"))
+    class Min : ReportPublicationsPluginTest(ReportPublicationsPlugin.MIN_GRADLE_VERSION)
+    class Current : ReportPublicationsPluginTest(GradleVersion.current().baseVersion.version)
+
+    private val rootDir = File(System.getProperty("projectRootDir"), gradleVersion)
 
     @Test
     fun `when run 'publish' on demo project, produces the expected output`() {
@@ -97,6 +102,7 @@ class ReportPublicationsPluginTest {
         )
 
         return GradleRunner.create()
+            .withGradleVersion(gradleVersion)
             .withProjectDir(rootDir)
             .withPluginClasspath()
             .withJaCoCo()

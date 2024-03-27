@@ -22,6 +22,7 @@ import org.gradle.kotlin.dsl.always
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.mapProperty
 import org.gradle.kotlin.dsl.registerIfAbsent
+import org.gradle.util.GradleVersion
 import javax.inject.Inject
 
 class ReportPublicationsPlugin @Inject constructor(
@@ -29,7 +30,15 @@ class ReportPublicationsPlugin @Inject constructor(
     private val flowScope: FlowScope,
 ) : Plugin<Project> {
 
+    companion object {
+        const val MIN_GRADLE_VERSION = "8.1"
+    }
+
     override fun apply(project: Project): Unit = with(project) {
+        check(GradleVersion.current() >= GradleVersion.version(MIN_GRADLE_VERSION)) {
+            "Gradle version must be at least $MIN_GRADLE_VERSION"
+        }
+
         if (project != rootProject) {
             rootProject.apply<ReportPublicationsPlugin>()
             return
