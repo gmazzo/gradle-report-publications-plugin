@@ -2,6 +2,7 @@ package io.github.gmazzo.publications.report
 
 import io.github.gmazzo.publications.report.ReportPublicationSerializer.deserialize
 import io.github.gmazzo.publications.report.ReportPublicationSerializer.serialize
+import io.github.gmazzo.publications.report.spi.PublicationsCollector
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.flow.FlowScope
@@ -10,16 +11,13 @@ import org.gradle.api.invocation.Gradle
 import org.gradle.api.logging.configuration.ShowStacktrace
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Provider
-import org.gradle.api.publish.maven.MavenArtifact
-import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
-import org.gradle.api.publish.maven.tasks.PublishToMavenLocal
-import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.kotlin.dsl.always
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.mapProperty
 import org.gradle.kotlin.dsl.registerIfAbsent
 import org.gradle.util.GradleVersion
+import java.util.ServiceLoader
 import javax.inject.Inject
 
 class ReportPublicationsPlugin @Inject constructor(
@@ -62,55 +60,33 @@ class ReportPublicationsPlugin @Inject constructor(
         .also(buildEventsListenerRegistry::onTaskCompletion)
 
     private fun Project.collectPublishTasksPublications(publications: MapProperty<String, ByteArray>) {
+        val collectors = ServiceLoader.load(PublicationsCollector::class.java).toList().asSequence()
         val buildPath = gradle.path
 
         gradle.taskGraph.whenReady {
             publications.putAll(provider {
-                allTasks.asSequence()
-                    .filterIsInstance<AbstractPublishToMaven>()
-                    .mapNotNull {
-                        runCatching { buildPath + it.path to serialize(resolvePublication(it)) }
-                            .onFailure { ex ->
+                allTasks.asSequence().flatMap { task ->
+                    collectors
+                        .flatMap { it.collectPublications(task) }
+                        .mapNotNull { pub ->
+                            val dryRunAwarePub =
+                                if (gradle.startParameter.isDryRun && pub.outcome == ReportPublication.Outcome.Unknown)
+                                    pub.copy(outcome = ReportPublication.Outcome.Skipped) else pub
+
+                            try {
+                                return@mapNotNull buildPath + task.path to serialize(dryRunAwarePub)
+
+                            } catch (ex: Exception) {
                                 logger.warn(
-                                    "Failed to resolve publication for task ${it.path}",
+                                    "Failed to resolve publication for task ${task.path}",
                                     ex.takeIf { gradle.startParameter.showStacktrace == ShowStacktrace.ALWAYS })
+
+                                return@mapNotNull null
                             }
-                            .getOrNull()
-                    }
-                    .toMap()
+                        }
+                }.toMap()
             })
         }
-    }
-
-    private fun Project.resolvePublication(task: AbstractPublishToMaven): ReportPublication {
-        val repository = when (task) {
-            is PublishToMavenLocal -> ReportPublication.Repository(
-                name = "mavenLocal",
-                value = "~/.m2/repository"
-            )
-
-            is PublishToMavenRepository -> ReportPublication.Repository(
-                name = task.repository.name,
-                value = task.repository.url.toString()
-            )
-
-            else -> ReportPublication.Repository(name = "<unknown>", value = "")
-        }
-        val artifacts = task.publication.artifacts.sortedWith(compareBy(MavenArtifact::getClassifier)).map {
-            when (val classifier = it.classifier) {
-                null -> it.extension
-                else -> "$classifier.${it.extension}"
-            }
-        }.ifEmpty { listOf("pom") }
-
-        return ReportPublication(
-            groupId = task.publication.groupId,
-            artifactId = task.publication.artifactId,
-            version = task.publication.version,
-            repository = repository,
-            outcome = if (gradle.startParameter.isDryRun) ReportPublication.Outcome.Skipped else ReportPublication.Outcome.Unknown,
-            artifacts = artifacts
-        )
     }
 
     private fun registerPublicationsReporter(

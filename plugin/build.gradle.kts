@@ -2,6 +2,7 @@ import java.lang.Thread.sleep
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.kotlin.samReceiver)
     alias(libs.plugins.gradle.pluginPublish)
     alias(libs.plugins.testkit.jacoco)
@@ -34,6 +35,9 @@ gradlePlugin {
 dependencies {
     compileOnly(gradleKotlinDsl())
     testImplementation(gradleKotlinDsl())
+
+    compileOnly(libs.autoservice.annotations)
+    ksp(libs.autoservice.ksp)
 }
 
 tasks.publish {
