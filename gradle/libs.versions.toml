@@ -1,6 +1,6 @@
 [versions]
 java = "11"
-kotlin = "1.9.23"
+kotlin = "1.9.24"
 
 [libraries]
 autoservice-annotations = { module = "com.google.auto.service:auto-service-annotations", version = "1.1.1" }
