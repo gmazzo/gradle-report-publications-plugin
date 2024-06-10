@@ -4,7 +4,7 @@ kotlin = "2.0.0"
 
 [libraries]
 autoservice-annotations = { module = "com.google.auto.service:auto-service-annotations", version = "1.1.1" }
-autoservice-ksp = { module = "dev.zacsweers.autoservice:auto-service-ksp", version = "1.1.0" }
+autoservice-ksp = { module = "dev.zacsweers.autoservice:auto-service-ksp", version = "1.2.0" }
 
 [plugins]
 kotlin-ksp = { id = "com.google.devtools.ksp", version = "2.0.0-1.0.22" }
