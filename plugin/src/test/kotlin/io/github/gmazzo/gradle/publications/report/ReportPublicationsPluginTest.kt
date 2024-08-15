@@ -6,6 +6,7 @@ import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.util.GradleVersion
 import java.io.File
+import java.io.PrintWriter
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -113,7 +114,7 @@ sealed class ReportPublicationsPluginTest(private val gradleVersion: String) {
             .withProjectDir(rootDir)
             .withPluginClasspath()
             .withJaCoCo()
-            .withArguments(*tasks)
+            .withArguments("--warning-mode", "all", *tasks)
             .forwardOutput()
             .build()
     }
