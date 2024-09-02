@@ -10,5 +10,5 @@ autoservice-ksp = { module = "dev.zacsweers.autoservice:auto-service-ksp", versi
 kotlin-ksp = { id = "com.google.devtools.ksp", version = "2.0.20-1.0.24" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-samReceiver = { id = "org.jetbrains.kotlin.plugin.sam.with.receiver", version.ref = "kotlin" }
-gradle-pluginPublish = { id = "com.gradle.plugin-publish", version = "1.2.1" }
+gradle-pluginPublish = { id = "com.gradle.plugin-publish", version = "1.2.2" }
 testkit-jacoco = { id = "pl.droidsonroids.jacoco.testkit", version = "1.0.12" }
