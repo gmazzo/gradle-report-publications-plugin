@@ -26,7 +26,7 @@ class ReportPublicationsPlugin @Inject constructor(
 ) : Plugin<Project> {
 
     companion object {
-        const val MIN_GRADLE_VERSION = "8.1"
+        const val MIN_GRADLE_VERSION = "8.2"
     }
 
     override fun apply(project: Project): Unit = with(project) {
