@@ -1,8 +1,11 @@
 plugins {
     id("io.github.gmazzo.publications.report")
+    java
     `ivy-publish`
     `maven-publish`
 }
+
+val javaVersion = JavaLanguageVersion.of(libs.versions.java.get())
 
 allprojects {
     apply(plugin = "java")
@@ -11,6 +14,7 @@ allprojects {
 
     group = "io.gmazzo.demo"
     version = "0.1.0"
+    java.toolchain.languageVersion = javaVersion
 
     publishing {
         publications {

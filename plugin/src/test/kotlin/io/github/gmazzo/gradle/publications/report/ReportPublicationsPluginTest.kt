@@ -99,6 +99,10 @@ sealed class ReportPublicationsPluginTest(private val gradleVersion: String) {
         }
 
         File("../demo").copyRecursively(rootDir)
+        File("../gradle/libs.versions.toml").apply {
+            copyTo(File(rootDir, "gradle/libs.versions.toml"))
+            copyTo(File(rootDir, "build-logic/gradle/libs.versions.toml"))
+        }
         File(rootDir, "settings.gradle.kts").writeText(
             """
             rootProject.name = "demo"
@@ -114,7 +118,7 @@ sealed class ReportPublicationsPluginTest(private val gradleVersion: String) {
             .withProjectDir(rootDir)
             .withPluginClasspath()
             .withJaCoCo()
-            .withArguments("--warning-mode", "all", *tasks)
+            .withArguments("--stacktrace", "--no-configuration-cache", "--warning-mode", "all", *tasks)
             .forwardOutput()
             .build()
     }

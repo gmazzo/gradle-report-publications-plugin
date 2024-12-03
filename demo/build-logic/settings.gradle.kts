@@ -4,6 +4,15 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
     }
+
+    val catalog = files("../../gradle/libs.versions.toml")
+    if (catalog.asFileTree.any()) {
+        versionCatalogs {
+            create("libs") {
+                from(catalog)
+            }
+        }
+    }
 }
 
 include("otherModule")
