@@ -105,6 +105,10 @@ sealed class ReportPublicationsPluginTest(private val gradleVersion: String) {
         }
         File(rootDir, "settings.gradle.kts").writeText(
             """
+            plugins {
+                id("jacoco-testkit-coverage")
+            }
+            
             rootProject.name = "demo"
          
             includeBuild("build-logic")
@@ -117,7 +121,6 @@ sealed class ReportPublicationsPluginTest(private val gradleVersion: String) {
             .withGradleVersion(gradleVersion)
             .withProjectDir(rootDir)
             .withPluginClasspath()
-            .withJaCoCo()
             .withArguments("--stacktrace", "--no-configuration-cache", "--warning-mode", "all", *tasks)
             .forwardOutput()
             .build()
@@ -127,11 +130,5 @@ sealed class ReportPublicationsPluginTest(private val gradleVersion: String) {
         get() = "(The following artifacts were published.*?)\\s*(?=BUILD SUCCESSFUL)"
             .toRegex(RegexOption.DOT_MATCHES_ALL)
             .find(output)?.groupValues?.get(1)
-
-    private fun GradleRunner.withJaCoCo() = apply {
-        File(projectDir, "gradle.properties")
-            .outputStream()
-            .use(javaClass.classLoader.getResourceAsStream("testkit-gradle.properties")::copyTo)
-    }
 
 }
