@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.samReceiver)
     alias(libs.plugins.gradle.pluginPublish)
     alias(libs.plugins.jacoco.testkit)
+    signing
 }
 
 group = "io.github.gmazzo.publications.report"
@@ -38,6 +39,15 @@ dependencies {
 
     compileOnly(libs.autoservice.annotations)
     ksp(libs.autoservice.ksp)
+}
+
+signing {
+    val signingKey: String? by project
+    val signingPassword: String? by project
+
+    useInMemoryPgpKeys(signingKey, signingPassword)
+    publishing.publications.configureEach(::sign)
+    tasks.withType<Sign>().configureEach { enabled = signingKey != null }
 }
 
 tasks.publish {
