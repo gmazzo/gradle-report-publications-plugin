@@ -3,13 +3,13 @@ package io.github.gmazzo.publications.report.spi
 import com.google.auto.service.AutoService
 import io.github.gmazzo.publications.report.ReportPublication
 import org.gradle.api.Task
-import org.gradle.api.publish.maven.MavenArtifact
+import org.gradle.api.publish.maven.internal.publication.MavenPublicationInternal
 import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
 import org.gradle.api.publish.maven.tasks.PublishToMavenLocal
 import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 
 @AutoService(PublicationsCollector::class)
-internal class PublicationsMavenCollector  : PublicationsCollector {
+internal class PublicationsMavenCollector : PublicationsCollector {
 
     override fun collectPublications(task: Task): List<ReportPublication> {
         if (task !is AbstractPublishToMaven) return emptyList()
@@ -27,12 +27,14 @@ internal class PublicationsMavenCollector  : PublicationsCollector {
 
             else -> ReportPublication.Repository(name = "<unknown>", value = "")
         }
-        val artifacts = task.publication.artifacts.sortedWith(compareBy(MavenArtifact::getClassifier)).map {
-            when (val classifier = it.classifier) {
-                null -> it.extension
-                else -> "$classifier.${it.extension}"
+        val artifacts = (task.publication as MavenPublicationInternal).publishableArtifacts
+            .sortedBy { it.classifier }
+            .map {
+                when (val classifier = it.classifier) {
+                    null -> it.extension
+                    else -> "$classifier.${it.extension}"
+                }
             }
-        }.ifEmpty { listOf("pom") }
 
         return listOf(
             ReportPublication(

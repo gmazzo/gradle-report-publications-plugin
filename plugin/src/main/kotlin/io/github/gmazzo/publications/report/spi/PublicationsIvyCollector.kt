@@ -3,7 +3,7 @@ package io.github.gmazzo.publications.report.spi
 import com.google.auto.service.AutoService
 import io.github.gmazzo.publications.report.ReportPublication
 import org.gradle.api.Task
-import org.gradle.api.publish.ivy.IvyArtifact
+import org.gradle.api.publish.ivy.internal.publication.IvyPublicationInternal
 import org.gradle.api.publish.ivy.tasks.PublishToIvyRepository
 
 @AutoService(PublicationsCollector::class)
@@ -16,12 +16,14 @@ internal class PublicationsIvyCollector : PublicationsCollector {
             name = task.repository.name,
             value = task.repository.url.toString()
         )
-        val artifacts = task.publication.artifacts.sortedWith(compareBy(IvyArtifact::getClassifier)).map {
-            when (val classifier = it.classifier) {
-                null -> it.extension
-                else -> "$classifier.${it.extension}"
+        val artifacts = (task.publication as IvyPublicationInternal).publishableArtifacts
+            .sortedBy { it.classifier }
+            .map {
+                when (val classifier = it.classifier) {
+                    null -> it.extension
+                    else -> "$classifier.${it.extension}"
+                }
             }
-        }.ifEmpty { listOf("ivy") }
 
         return listOf(
             ReportPublication(

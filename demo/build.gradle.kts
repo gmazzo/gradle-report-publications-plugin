@@ -3,18 +3,26 @@ plugins {
     java
     `ivy-publish`
     `maven-publish`
+    signing
 }
 
 val javaVersion = JavaLanguageVersion.of(libs.versions.java.get())
+val singingKeyFile = providers.fileContents(layout.projectDirectory.file("singingkey.asc")).asText
 
 allprojects {
     apply(plugin = "java")
     apply(plugin = "ivy-publish")
     apply(plugin = "maven-publish")
+    apply(plugin = "signing")
 
     group = "io.gmazzo.demo"
     version = "0.1.0"
     java.toolchain.languageVersion = javaVersion
+
+    signing {
+        useInMemoryPgpKeys(singingKeyFile.get(), "org.demo")
+        sign(publishing.publications)
+    }
 
     publishing {
         publications {
@@ -28,6 +36,10 @@ allprojects {
             ivy(url = repos.map { it.dir("ivy").asFile.toURI() }) { name = "localIvy" }
         }
     }
+
+    // CC issue with Ivy publication tasks
+    tasks.withType<PublishToIvyRepository>().configureEach { mustRunAfter(tasks.withType<Sign>()) }
+    tasks.withType<AbstractPublishToMaven>().configureEach { mustRunAfter(tasks.withType<Sign>()) }
 }
 
 tasks {

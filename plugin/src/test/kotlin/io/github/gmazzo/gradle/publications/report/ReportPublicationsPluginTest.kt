@@ -27,18 +27,18 @@ sealed class ReportPublicationsPluginTest(private val gradleVersion: String) {
         assertEquals(
             """
             The following artifacts were published to localIvy(${rootDir.resolve("publish/build/repo/ivy/").toURI()}):
-             - io.gmazzo.demo:demo:0.1.0 [jar]
-             - io.gmazzo.demo:module1:0.1.0 [jar]
-             - io.gmazzo.demo:module2:0.1.0 [jar]
-             - io.gmazzo.demo.build-logic:build-logic:0.1.0 [jar]
-             - io.gmazzo.demo.build-logic:otherModule:0.1.0 [jar]
+             - io.gmazzo.demo:demo:0.1.0 [jar, xml, module, xml.asc, module.asc, jar.asc]
+             - io.gmazzo.demo:module1:0.1.0 [jar, xml, module, xml.asc, module.asc, jar.asc]
+             - io.gmazzo.demo:module2:0.1.0 [jar, xml, module, xml.asc, module.asc, jar.asc]
+             - io.gmazzo.demo.build-logic:build-logic:0.1.0 [jar, xml, module]
+             - io.gmazzo.demo.build-logic:otherModule:0.1.0 [jar, xml, module]
             The following artifacts were published to localMaven(${rootDir.resolve("publish/build/repo/maven/").toURI()}):
-             - io.gmazzo.demo:demo:0.1.0 [jar]
-             - io.gmazzo.demo:module1:0.1.0 [jar] (skipped)
-             - io.gmazzo.demo:module2:0.1.0 [jar]
-             - io.gmazzo.demo.build-logic:build-logic:0.1.0 [jar]
-             - io.gmazzo.demo.build-logic:otherModule:0.1.0 [jar]
-        """.trimIndent(), result.reportPublicationsOutput?.normaliseLineSeparators()
+             - io.gmazzo.demo:demo:0.1.0 [jar, pom, module, pom.asc, module.asc, jar.asc]
+             - io.gmazzo.demo:module1:0.1.0 [jar, pom, module, pom.asc, module.asc, jar.asc] (skipped)
+             - io.gmazzo.demo:module2:0.1.0 [jar, pom, module, pom.asc, module.asc, jar.asc]
+             - io.gmazzo.demo.build-logic:build-logic:0.1.0 [jar, pom, module]
+             - io.gmazzo.demo.build-logic:otherModule:0.1.0 [jar, pom, module]
+            """.trimIndent(), result.reportPublicationsOutput?.normaliseLineSeparators()
         )
     }
 
@@ -52,12 +52,12 @@ sealed class ReportPublicationsPluginTest(private val gradleVersion: String) {
         assertEquals(
             """
             The following artifacts were published to mavenLocal(~/.m2/repository):
-             - io.gmazzo.demo:demo:0.1.0 [jar]
-             - io.gmazzo.demo:module1:0.1.0 [jar] (skipped)
-             - io.gmazzo.demo:module2:0.1.0 [jar]
-             - io.gmazzo.demo.build-logic:build-logic:0.1.0 [jar]
-             - io.gmazzo.demo.build-logic:otherModule:0.1.0 [jar]
-        """.trimIndent(), result.reportPublicationsOutput?.normaliseLineSeparators()
+             - io.gmazzo.demo:demo:0.1.0 [jar, pom, module, pom.asc, module.asc, jar.asc]
+             - io.gmazzo.demo:module1:0.1.0 [jar, pom, module, pom.asc, module.asc, jar.asc] (skipped)
+             - io.gmazzo.demo:module2:0.1.0 [jar, pom, module, pom.asc, module.asc, jar.asc]
+             - io.gmazzo.demo.build-logic:build-logic:0.1.0 [jar, pom, module]
+             - io.gmazzo.demo.build-logic:otherModule:0.1.0 [jar, pom, module]
+            """.trimIndent(), result.reportPublicationsOutput?.normaliseLineSeparators()
         )
     }
 
@@ -71,24 +71,24 @@ sealed class ReportPublicationsPluginTest(private val gradleVersion: String) {
         assertEquals(
             """
             The following artifacts were published to localIvy(${rootDir.resolve("publish-publishToMavenLocal/build/repo/ivy/").toURI()}):
-             - io.gmazzo.demo:demo:0.1.0 [jar]
-             - io.gmazzo.demo:module1:0.1.0 [jar]
-             - io.gmazzo.demo:module2:0.1.0 [jar]
-             - io.gmazzo.demo.build-logic:build-logic:0.1.0 [jar]
-             - io.gmazzo.demo.build-logic:otherModule:0.1.0 [jar]
+             - io.gmazzo.demo:demo:0.1.0 [jar, xml, module, xml.asc, module.asc, jar.asc]
+             - io.gmazzo.demo:module1:0.1.0 [jar, xml, module, xml.asc, module.asc, jar.asc]
+             - io.gmazzo.demo:module2:0.1.0 [jar, xml, module, xml.asc, module.asc, jar.asc]
+             - io.gmazzo.demo.build-logic:build-logic:0.1.0 [jar, xml, module]
+             - io.gmazzo.demo.build-logic:otherModule:0.1.0 [jar, xml, module]
             The following artifacts were published to localMaven(${rootDir.resolve("publish-publishToMavenLocal/build/repo/maven/").toURI()}):
-             - io.gmazzo.demo:demo:0.1.0 [jar]
-             - io.gmazzo.demo:module1:0.1.0 [jar] (skipped)
-             - io.gmazzo.demo:module2:0.1.0 [jar]
-             - io.gmazzo.demo.build-logic:build-logic:0.1.0 [jar]
-             - io.gmazzo.demo.build-logic:otherModule:0.1.0 [jar]
+             - io.gmazzo.demo:demo:0.1.0 [jar, pom, module, pom.asc, module.asc, jar.asc]
+             - io.gmazzo.demo:module1:0.1.0 [jar, pom, module, pom.asc, module.asc, jar.asc] (skipped)
+             - io.gmazzo.demo:module2:0.1.0 [jar, pom, module, pom.asc, module.asc, jar.asc]
+             - io.gmazzo.demo.build-logic:build-logic:0.1.0 [jar, pom, module]
+             - io.gmazzo.demo.build-logic:otherModule:0.1.0 [jar, pom, module]
             The following artifacts were published to mavenLocal(~/.m2/repository):
-             - io.gmazzo.demo:demo:0.1.0 [jar]
-             - io.gmazzo.demo:module1:0.1.0 [jar] (skipped)
-             - io.gmazzo.demo:module2:0.1.0 [jar]
-             - io.gmazzo.demo.build-logic:build-logic:0.1.0 [jar]
-             - io.gmazzo.demo.build-logic:otherModule:0.1.0 [jar]
-        """.trimIndent(), result.reportPublicationsOutput?.normaliseLineSeparators()
+             - io.gmazzo.demo:demo:0.1.0 [jar, pom, module, pom.asc, module.asc, jar.asc]
+             - io.gmazzo.demo:module1:0.1.0 [jar, pom, module, pom.asc, module.asc, jar.asc] (skipped)
+             - io.gmazzo.demo:module2:0.1.0 [jar, pom, module, pom.asc, module.asc, jar.asc]
+             - io.gmazzo.demo.build-logic:build-logic:0.1.0 [jar, pom, module]
+             - io.gmazzo.demo.build-logic:otherModule:0.1.0 [jar, pom, module]
+            """.trimIndent(), result.reportPublicationsOutput?.normaliseLineSeparators()
         )
     }
 
