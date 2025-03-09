@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.gradle.pluginPublish)
     alias(libs.plugins.jacoco.testkit)
     signing
+    id("io.github.gmazzo.publications.report") version "+" // self reference to latest published, for reporting this one
 }
 
 group = "io.github.gmazzo.publications.report"
