@@ -55,6 +55,11 @@ tasks.publish {
 
 testing.suites.withType<JvmTestSuite> {
     useKotlinTest()
+    targets.all {
+        testTask {
+            javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(17) }
+        }
+    }
 }
 
 tasks.test {
