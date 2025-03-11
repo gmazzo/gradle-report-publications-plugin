@@ -5,6 +5,7 @@ import io.github.gmazzo.publications.report.ReportPublicationSerializer.serializ
 import io.github.gmazzo.publications.report.spi.PublicationsCollector
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.flow.FlowScope
 import org.gradle.api.internal.GradleInternal
 import org.gradle.api.invocation.Gradle
@@ -67,26 +68,27 @@ class ReportPublicationsPlugin @Inject constructor(
             publications.putAll(provider {
                 allTasks.asSequence().flatMap { task ->
                     collectors
-                        .flatMap { it.collectPublications(task) }
-                        .mapNotNull { pub ->
+                        .flatMap { guard(task) { it.collectPublications(task) }.orEmpty() }
+                        .mapNotNull { pub: ReportPublication ->
                             val dryRunAwarePub =
                                 if (gradle.startParameter.isDryRun && pub.outcome == ReportPublication.Outcome.Unknown)
                                     pub.copy(outcome = ReportPublication.Outcome.Skipped) else pub
 
-                            try {
-                                return@mapNotNull buildPath + task.path to serialize(dryRunAwarePub)
-
-                            } catch (ex: Exception) {
-                                logger.warn(
-                                    "Failed to resolve publication for task ${task.path}",
-                                    ex.takeIf { gradle.startParameter.showStacktrace == ShowStacktrace.ALWAYS })
-
-                                return@mapNotNull null
-                            }
+                            guard(task) { buildPath + task.path to serialize(dryRunAwarePub) }
                         }
                 }.toMap()
             })
         }
+    }
+
+    private fun <Return> Project.guard(task: Task, block: () -> Return): Return? = try {
+        block()
+
+    } catch (ex: Exception) {
+        logger.warn(
+            "Failed to resolve publication for task ${task.path}",
+            ex.takeIf { gradle.startParameter.showStacktrace == ShowStacktrace.ALWAYS })
+        null
     }
 
     private fun registerPublicationsReporter(
