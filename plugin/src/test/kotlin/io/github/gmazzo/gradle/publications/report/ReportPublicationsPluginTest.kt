@@ -1,14 +1,14 @@
 package io.github.gmazzo.gradle.publications.report
 
 import io.github.gmazzo.publications.report.ReportPublicationsPlugin
+import java.io.File
+import kotlin.test.Test
+import kotlin.test.assertEquals
 import org.gradle.kotlin.dsl.support.normaliseLineSeparators
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.util.GradleVersion
-import java.io.File
-import kotlin.test.Test
-import kotlin.test.assertEquals
 
 sealed class ReportPublicationsPluginTest(private val gradleVersion: String) {
 
@@ -32,7 +32,9 @@ sealed class ReportPublicationsPluginTest(private val gradleVersion: String) {
              - io.gmazzo.demo:module2:0.1.0 [jar, xml, module, xml.asc, module.asc, jar.asc]
              - io.gmazzo.demo.build-logic:build-logic:0.1.0 [jar, xml, module]
              - io.gmazzo.demo.build-logic:otherModule:0.1.0 [jar, xml, module]
-            The following artifacts were published to localMaven(${rootDir.resolve("publish/build/repo/maven/").toURI()}):
+            The following artifacts were published to localMaven(${
+                rootDir.resolve("publish/build/repo/maven/").toURI()
+            }):
              - io.gmazzo.demo:demo:0.1.0 [jar, pom, module, pom.asc, module.asc, jar.asc]
              - io.gmazzo.demo:module1:0.1.0 [jar, pom, module, pom.asc, module.asc, jar.asc] (skipped)
              - io.gmazzo.demo:module2:0.1.0 [jar, pom, module, pom.asc, module.asc, jar.asc]
@@ -70,13 +72,17 @@ sealed class ReportPublicationsPluginTest(private val gradleVersion: String) {
 
         assertEquals(
             """
-            The following artifacts were published to localIvy(${rootDir.resolve("publish-publishToMavenLocal/build/repo/ivy/").toURI()}):
+            The following artifacts were published to localIvy(${
+                rootDir.resolve("publish-publishToMavenLocal/build/repo/ivy/").toURI()
+            }):
              - io.gmazzo.demo:demo:0.1.0 [jar, xml, module, xml.asc, module.asc, jar.asc]
              - io.gmazzo.demo:module1:0.1.0 [jar, xml, module, xml.asc, module.asc, jar.asc]
              - io.gmazzo.demo:module2:0.1.0 [jar, xml, module, xml.asc, module.asc, jar.asc]
              - io.gmazzo.demo.build-logic:build-logic:0.1.0 [jar, xml, module]
              - io.gmazzo.demo.build-logic:otherModule:0.1.0 [jar, xml, module]
-            The following artifacts were published to localMaven(${rootDir.resolve("publish-publishToMavenLocal/build/repo/maven/").toURI()}):
+            The following artifacts were published to localMaven(${
+                rootDir.resolve("publish-publishToMavenLocal/build/repo/maven/").toURI()
+            }):
              - io.gmazzo.demo:demo:0.1.0 [jar, pom, module, pom.asc, module.asc, jar.asc]
              - io.gmazzo.demo:module1:0.1.0 [jar, pom, module, pom.asc, module.asc, jar.asc] (skipped)
              - io.gmazzo.demo:module2:0.1.0 [jar, pom, module, pom.asc, module.asc, jar.asc]
@@ -108,9 +114,9 @@ sealed class ReportPublicationsPluginTest(private val gradleVersion: String) {
             plugins {
                 id("jacoco-testkit-coverage")
             }
-            
+
             rootProject.name = "demo"
-         
+
             includeBuild("build-logic")
             include("module1")
             include("module2")

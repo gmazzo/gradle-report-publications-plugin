@@ -22,7 +22,7 @@ abstract class ReportPublicationsService :
         }
     }
 
-    private fun resolve(result: TaskOperationResult) = when(result) {
+    private fun resolve(result: TaskOperationResult) = when (result) {
         is TaskSuccessResult -> ReportPublication.Outcome.Published
         is TaskFailureResult -> ReportPublication.Outcome.Failed
         is TaskSkippedResult -> ReportPublication.Outcome.Skipped

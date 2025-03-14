@@ -11,7 +11,8 @@ plugins {
 }
 
 group = "io.github.gmazzo.publications.report"
-description = "Decorates the build logs with maven coordinates of artifacts published with `publish` or `publishToMavenLocal`"
+description =
+    "Decorates the build logs with maven coordinates of artifacts published with `publish` or `publishToMavenLocal`"
 scmVersion.repository.directory.set(rootDir.parentFile.absolutePath)
 version = scmVersion.version
 

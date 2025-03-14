@@ -3,6 +3,8 @@ package io.github.gmazzo.publications.report
 import io.github.gmazzo.publications.report.ReportPublicationSerializer.deserialize
 import io.github.gmazzo.publications.report.ReportPublicationSerializer.serialize
 import io.github.gmazzo.publications.report.spi.PublicationsCollector
+import java.util.*
+import javax.inject.Inject
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -18,8 +20,6 @@ import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.mapProperty
 import org.gradle.kotlin.dsl.registerIfAbsent
 import org.gradle.util.GradleVersion
-import java.util.ServiceLoader
-import javax.inject.Inject
 
 class ReportPublicationsPlugin @Inject constructor(
     private val buildEventsListenerRegistry: BuildEventsListenerRegistry,

@@ -11,7 +11,7 @@ data class ReportPublication(
     val artifacts: List<String>,
 ) : Serializable {
 
-    data class Repository(val name: String, val value: String): Serializable
+    data class Repository(val name: String, val value: String) : Serializable
 
     enum class Outcome { Published, Failed, Skipped, Unknown }
 
