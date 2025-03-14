@@ -1,14 +1,13 @@
 package io.github.gmazzo.publications.report
 
+import java.util.*
+import javax.inject.Inject
 import org.gradle.api.flow.FlowAction
 import org.gradle.api.flow.FlowParameters
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.tasks.Input
 import org.gradle.internal.logging.text.StyledTextOutput
 import org.gradle.internal.logging.text.StyledTextOutputFactory
-import java.util.TreeMap
-import java.util.TreeSet
-import javax.inject.Inject
 
 abstract class ReportPublicationsFlowAction : FlowAction<ReportPublicationsFlowAction.Params> {
 

@@ -5,19 +5,25 @@
 [![Users](https://img.shields.io/badge/users_by-Sourcegraph-purple)](https://sourcegraph.com/search?q=content:io.github.gmazzo.publications.report+-repo:github.com/gmazzo/gradle-report-publications-plugin)
 
 # gradle-report-publications-plugin
-A Gradle plugin that decorates the build logs with maven coordinates of artifacts published with `publish` or `publishToMavenLocal`
+
+A Gradle plugin that decorates the build logs with maven coordinates of artifacts published with `publish` or
+`publishToMavenLocal`
 
 # Usage
+
 Apply the plugin at the **root** project (preferable):
+
 ```kotlin
 plugins {
-    id("io.github.gmazzo.publications.report") version "<latest>" 
+    id("io.github.gmazzo.publications.report") version "<latest>"
 }
 ```
 
-Then, whenever you call Maven Publish task (usually `publish` or `publishToMavenLocal`) on any project, the plugin will decorate the build logs showing maven coordinates (`GAV`):
+Then, whenever you call Maven Publish task (usually `publish` or `publishToMavenLocal`) on any project, the plugin will
+decorate the build logs showing maven coordinates (`GAV`):
 
 For instance, the `demo` project will print for `publishToMavenLocal`:
+
 ```
 > Task :publishToMavenLocal
 
@@ -28,7 +34,8 @@ The following artifacts were published to mavenLocal(~/.m2/repository):
  - io.gmazzo.demo.build-logic:build-logic:0.1.0 jar
  - io.gmazzo.demo.build-logic:otherModule:0.1.0 jar
 ```
+
 ![`./gradlew publishToMavenLocal` output example](README-example-output.png)
 > [!NOTE]
-> This plugin can gather publications from `includedBuild`s too. 
+> This plugin can gather publications from `includedBuild`s too.
 > But it also needs to be applied at the root project of the `includedBuild` to work properly.
