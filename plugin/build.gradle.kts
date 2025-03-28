@@ -3,8 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.kotlin.samReceiver)
     alias(libs.plugins.dokka)
-    alias(libs.plugins.axion.release)
     alias(libs.plugins.mavenPublish)
+    alias(libs.plugins.gitVersion)
     alias(libs.plugins.gradle.pluginPublish)
     alias(libs.plugins.jacoco.testkit)
     id("io.github.gmazzo.publications.report") version "+" // self reference to latest published, for reporting this one
@@ -13,8 +13,6 @@ plugins {
 group = "io.github.gmazzo.publications.report"
 description =
     "Decorates the build logs with maven coordinates of artifacts published with `publish` or `publishToMavenLocal`"
-scmVersion.repository.directory.set(rootDir.parentFile.absolutePath)
-version = scmVersion.version
 
 java.toolchain.languageVersion.set(JavaLanguageVersion.of(libs.versions.java.get()))
 samWithReceiver.annotation(HasImplicitReceiver::class.qualifiedName!!)
