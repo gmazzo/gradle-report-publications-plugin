@@ -4,6 +4,8 @@
 [![Coverage](https://codecov.io/gh/gmazzo/gradle-report-publications-plugin/branch/main/graph/badge.svg?token=D5cDiPWvcS)](https://codecov.io/gh/gmazzo/gradle-report-publications-plugin)
 [![Users](https://img.shields.io/badge/users_by-Sourcegraph-purple)](https://sourcegraph.com/search?q=content:io.github.gmazzo.publications.report+-repo:github.com/gmazzo/gradle-report-publications-plugin)
 
+[![Contributors](https://contrib.rocks/image?repo=gmazzo/gradle-report-publications-plugin)](https://github.com/gmazzo/gradle-report-publications-plugin/graphs/contributors)
+
 # gradle-report-publications-plugin
 
 A Gradle plugin that decorates the build logs with maven coordinates of artifacts published with `publish` or
