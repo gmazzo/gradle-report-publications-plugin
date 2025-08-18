@@ -1,6 +1,6 @@
 [versions]
 java = "11"
-kotlin = "2.2.0"
+kotlin = "2.2.10"
 
 [libraries]
 autoservice-annotations = { module = "com.google.auto.service:auto-service-annotations", version = "1.1.1" }
@@ -8,7 +8,7 @@ autoservice-ksp = { module = "dev.zacsweers.autoservice:auto-service-ksp", versi
 
 [plugins]
 dokka = { id = "org.jetbrains.dokka-javadoc", version = "2.0.0" }
-kotlin-ksp = { id = "com.google.devtools.ksp", version = "2.2.0-2.0.2" }
+kotlin-ksp = { id = "com.google.devtools.ksp", version = "2.2.10-2.0.2" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-samReceiver = { id = "org.jetbrains.kotlin.plugin.sam.with.receiver", version.ref = "kotlin" }
 gitVersion = { id = "io.github.gmazzo.gitversion", version = "1.4.0" }
