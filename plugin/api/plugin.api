@@ -1,0 +1,83 @@
+public final class io/github/gmazzo/publications/report/ReportPublication : java/io/Serializable {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lio/github/gmazzo/publications/report/ReportPublication$Repository;Lio/github/gmazzo/publications/report/ReportPublication$Outcome;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Lio/github/gmazzo/publications/report/ReportPublication$Repository;
+	public final fun component5 ()Lio/github/gmazzo/publications/report/ReportPublication$Outcome;
+	public final fun component6 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lio/github/gmazzo/publications/report/ReportPublication$Repository;Lio/github/gmazzo/publications/report/ReportPublication$Outcome;Ljava/util/List;)Lio/github/gmazzo/publications/report/ReportPublication;
+	public static synthetic fun copy$default (Lio/github/gmazzo/publications/report/ReportPublication;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lio/github/gmazzo/publications/report/ReportPublication$Repository;Lio/github/gmazzo/publications/report/ReportPublication$Outcome;Ljava/util/List;ILjava/lang/Object;)Lio/github/gmazzo/publications/report/ReportPublication;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getArtifactId ()Ljava/lang/String;
+	public final fun getArtifacts ()Ljava/util/List;
+	public final fun getGroupId ()Ljava/lang/String;
+	public final fun getOutcome ()Lio/github/gmazzo/publications/report/ReportPublication$Outcome;
+	public final fun getRepository ()Lio/github/gmazzo/publications/report/ReportPublication$Repository;
+	public final fun getVersion ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/gmazzo/publications/report/ReportPublication$Outcome : java/lang/Enum {
+	public static final field Failed Lio/github/gmazzo/publications/report/ReportPublication$Outcome;
+	public static final field Published Lio/github/gmazzo/publications/report/ReportPublication$Outcome;
+	public static final field Skipped Lio/github/gmazzo/publications/report/ReportPublication$Outcome;
+	public static final field Unknown Lio/github/gmazzo/publications/report/ReportPublication$Outcome;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/gmazzo/publications/report/ReportPublication$Outcome;
+	public static fun values ()[Lio/github/gmazzo/publications/report/ReportPublication$Outcome;
+}
+
+public final class io/github/gmazzo/publications/report/ReportPublication$Repository : java/io/Serializable {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/gmazzo/publications/report/ReportPublication$Repository;
+	public static synthetic fun copy$default (Lio/github/gmazzo/publications/report/ReportPublication$Repository;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/gmazzo/publications/report/ReportPublication$Repository;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName ()Ljava/lang/String;
+	public final fun getValue ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/gmazzo/publications/report/ReportPublicationSerializer {
+	public static final field INSTANCE Lio/github/gmazzo/publications/report/ReportPublicationSerializer;
+	public final fun deserialize ([B)Lio/github/gmazzo/publications/report/ReportPublication;
+	public final fun serialize (Lio/github/gmazzo/publications/report/ReportPublication;)[B
+}
+
+public abstract class io/github/gmazzo/publications/report/ReportPublicationsFlowAction : org/gradle/api/flow/FlowAction {
+	public fun <init> ()V
+	public fun execute (Lio/github/gmazzo/publications/report/ReportPublicationsFlowAction$Params;)V
+	public synthetic fun execute (Lorg/gradle/api/flow/FlowParameters;)V
+}
+
+public abstract interface class io/github/gmazzo/publications/report/ReportPublicationsFlowAction$Params : org/gradle/api/flow/FlowParameters {
+	public abstract fun getOutcomes ()Lorg/gradle/api/provider/MapProperty;
+	public abstract fun getPublications ()Lorg/gradle/api/provider/MapProperty;
+	public abstract fun getStyledTextOutputFactory ()Lorg/gradle/internal/logging/text/StyledTextOutputFactory;
+}
+
+public final class io/github/gmazzo/publications/report/ReportPublicationsPlugin : org/gradle/api/Plugin {
+	public static final field Companion Lio/github/gmazzo/publications/report/ReportPublicationsPlugin$Companion;
+	public static final field MIN_GRADLE_VERSION Ljava/lang/String;
+	public fun <init> (Lorg/gradle/build/event/BuildEventsListenerRegistry;Lorg/gradle/api/flow/FlowScope;)V
+	public synthetic fun apply (Ljava/lang/Object;)V
+	public fun apply (Lorg/gradle/api/Project;)V
+}
+
+public final class io/github/gmazzo/publications/report/ReportPublicationsPlugin$Companion {
+}
+
+public abstract class io/github/gmazzo/publications/report/ReportPublicationsService : org/gradle/api/services/BuildService, org/gradle/tooling/events/OperationCompletionListener {
+	public fun <init> ()V
+	public final fun getTasksOutcome ()Ljava/util/Map;
+	public fun onFinish (Lorg/gradle/tooling/events/FinishEvent;)V
+}
+
+public abstract interface class io/github/gmazzo/publications/report/spi/PublicationsCollector {
+	public abstract fun collectPublications (Lorg/gradle/api/Task;)Ljava/util/List;
+}
+

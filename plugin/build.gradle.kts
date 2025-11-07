@@ -1,3 +1,7 @@
+@file:OptIn(ExperimentalAbiValidation::class)
+
+import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.ksp)
@@ -16,6 +20,7 @@ description =
 
 java.toolchain.languageVersion.set(JavaLanguageVersion.of(libs.versions.java.get()))
 samWithReceiver.annotation(HasImplicitReceiver::class.qualifiedName!!)
+kotlin.abiValidation.enabled = true
 
 val originUrl = providers
     .exec { commandLine("git", "remote", "get-url", "origin") }
@@ -84,6 +89,14 @@ afterEvaluate {
 
 tasks.withType<PublishToMavenRepository>().configureEach {
     mustRunAfter(tasks.publishPlugins)
+}
+
+tasks.validatePlugins {
+    enableStricterValidation = true
+}
+
+tasks.check {
+    dependsOn(tasks.checkLegacyAbi)
 }
 
 tasks.publishPlugins {
