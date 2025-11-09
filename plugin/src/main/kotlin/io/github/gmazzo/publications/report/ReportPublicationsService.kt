@@ -10,11 +10,11 @@ import org.gradle.tooling.events.task.TaskOperationResult
 import org.gradle.tooling.events.task.TaskSkippedResult
 import org.gradle.tooling.events.task.TaskSuccessResult
 
-abstract class ReportPublicationsService :
+public abstract class ReportPublicationsService :
     BuildService<BuildServiceParameters.None>,
     OperationCompletionListener {
 
-    val tasksOutcome = mutableMapOf<String, ReportPublication.Outcome>()
+    public val tasksOutcome: MutableMap<String, ReportPublication.Outcome> = mutableMapOf<String, ReportPublication.Outcome>()
 
     override fun onFinish(event: FinishEvent) {
         when (event) {
