@@ -9,7 +9,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.internal.logging.text.StyledTextOutput
 import org.gradle.internal.logging.text.StyledTextOutputFactory
 
-abstract class ReportPublicationsFlowAction : FlowAction<ReportPublicationsFlowAction.Params> {
+public abstract class ReportPublicationsFlowAction : FlowAction<ReportPublicationsFlowAction.Params> {
 
     private val publicationsComparator =
         compareBy(ReportPublication::groupId, ReportPublication::artifactId, ReportPublication::version)
@@ -64,16 +64,16 @@ abstract class ReportPublicationsFlowAction : FlowAction<ReportPublicationsFlowA
         }
     }
 
-    interface Params : FlowParameters {
+    public interface Params : FlowParameters {
 
         @get:Inject
-        val styledTextOutputFactory: StyledTextOutputFactory
+        public val styledTextOutputFactory: StyledTextOutputFactory
 
         @get:Input
-        val publications: MapProperty<String, ReportPublication>
+        public val publications: MapProperty<String, ReportPublication>
 
         @get:Input
-        val outcomes: MapProperty<String, ReportPublication.Outcome>
+        public val outcomes: MapProperty<String, ReportPublication.Outcome>
 
     }
 

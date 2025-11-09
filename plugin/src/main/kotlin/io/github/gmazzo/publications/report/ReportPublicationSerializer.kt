@@ -20,14 +20,14 @@ import java.io.ObjectOutputStream
  * 1) TOML is not supported for them
  * 2) You need to define the plugin version on every settings `plugins` closure
  */
-object ReportPublicationSerializer {
+public object ReportPublicationSerializer {
 
-    fun serialize(publication: ReportPublication) = with(ByteArrayOutputStream()) {
+    public fun serialize(publication: ReportPublication): ByteArray = with(ByteArrayOutputStream()) {
         ObjectOutputStream(this).use { it.writeObject(publication) }
         toByteArray()
     }
 
-    fun deserialize(bytes: ByteArray) = bytes.inputStream().use {
+    public fun deserialize(bytes: ByteArray): ReportPublication = bytes.inputStream().use {
         ObjectInputStream(it).readObject() as ReportPublication
     }
 

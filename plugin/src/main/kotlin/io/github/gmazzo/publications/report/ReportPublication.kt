@@ -2,7 +2,7 @@ package io.github.gmazzo.publications.report
 
 import java.io.Serializable
 
-data class ReportPublication(
+public data class ReportPublication(
     val groupId: String,
     val artifactId: String,
     val version: String,
@@ -11,8 +11,8 @@ data class ReportPublication(
     val artifacts: List<String>,
 ) : Serializable {
 
-    data class Repository(val name: String, val value: String) : Serializable
+    public data class Repository(val name: String, val value: String) : Serializable
 
-    enum class Outcome { Published, Failed, Skipped, Unknown }
+    public enum class Outcome { Published, Failed, Skipped, Unknown }
 
 }

@@ -21,13 +21,13 @@ import org.gradle.kotlin.dsl.mapProperty
 import org.gradle.kotlin.dsl.registerIfAbsent
 import org.gradle.util.GradleVersion
 
-class ReportPublicationsPlugin @Inject constructor(
+public class ReportPublicationsPlugin @Inject constructor(
     private val buildEventsListenerRegistry: BuildEventsListenerRegistry,
     private val flowScope: FlowScope,
 ) : Plugin<Project> {
 
-    companion object {
-        const val MIN_GRADLE_VERSION = "8.2"
+    public companion object {
+        public const val MIN_GRADLE_VERSION: String = "8.2"
     }
 
     override fun apply(project: Project): Unit = with(project) {
