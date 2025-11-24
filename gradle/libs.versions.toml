@@ -8,7 +8,7 @@ autoservice-ksp = { module = "dev.zacsweers.autoservice:auto-service-ksp", versi
 
 [plugins]
 dokka = { id = "org.jetbrains.dokka-javadoc", version = "2.1.0" }
-kotlin-ksp = { id = "com.google.devtools.ksp", version = "2.3.2" }
+kotlin-ksp = { id = "com.google.devtools.ksp", version = "2.3.3" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-samReceiver = { id = "org.jetbrains.kotlin.plugin.sam.with.receiver", version.ref = "kotlin" }
 gitVersion = { id = "io.github.gmazzo.gitversion", version = "1.5.1" }
