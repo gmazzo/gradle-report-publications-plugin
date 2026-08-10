@@ -1,3 +1,3 @@
 plugins {
-    java
+    id("demo-module-convention")
 }

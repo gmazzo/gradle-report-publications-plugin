@@ -2,18 +2,18 @@ package io.github.gmazzo.publications.report.spi
 
 import com.google.auto.service.AutoService
 import io.github.gmazzo.publications.report.ReportPublication
-import org.gradle.api.Task
 import org.gradle.api.publish.maven.internal.publication.MavenPublicationInternal
 import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
 import org.gradle.api.publish.maven.tasks.PublishToMavenLocal
 import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 
 @AutoService(PublicationsCollector::class)
-internal class PublicationsMavenCollector : PublicationsCollector {
+internal class PublicationsMavenCollector : PublicationsCollector<AbstractPublishToMaven> {
 
-    override fun collectPublications(task: Task): List<ReportPublication> {
-        if (task !is AbstractPublishToMaven) return emptyList()
+    override val accepts =
+        AbstractPublishToMaven::class.java
 
+    override fun collectPublications(task: AbstractPublishToMaven): List<ReportPublication> {
         val repository = when (task) {
             is PublishToMavenLocal -> ReportPublication.Repository(
                 name = "mavenLocal",

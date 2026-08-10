@@ -4,27 +4,26 @@ import java.util.*
 import javax.inject.Inject
 import org.gradle.api.flow.FlowAction
 import org.gradle.api.flow.FlowParameters
-import org.gradle.api.provider.MapProperty
-import org.gradle.api.tasks.Input
+import org.gradle.api.provider.Property
+import org.gradle.api.services.ServiceReference
 import org.gradle.internal.logging.text.StyledTextOutput
 import org.gradle.internal.logging.text.StyledTextOutputFactory
 
-public abstract class ReportPublicationsFlowAction : FlowAction<ReportPublicationsFlowAction.Params> {
+internal abstract class ReportPublicationsFlowAction : FlowAction<ReportPublicationsFlowAction.Params> {
 
     private val publicationsComparator =
         compareBy(ReportPublication::groupId, ReportPublication::artifactId, ReportPublication::version)
 
     override fun execute(parameters: Params) {
+        val service = parameters.service.get()
         val logger = parameters.styledTextOutputFactory.create(ReportPublication::class.java)
+
         val publications =
             TreeMap<ReportPublication.Repository, TreeSet<ReportPublication>>(compareBy(ReportPublication.Repository::value))
-        val outcomes = parameters.outcomes.get()
 
-        parameters.publications.get().forEach { (path, pub) ->
-            val outcome = outcomes[path] ?: pub.outcome
-
+        for (pub in service.collectPublications()) {
             publications.compute(pub.repository) { _, set ->
-                (set ?: TreeSet(publicationsComparator)).apply { add(pub.copy(outcome = outcome)) }
+                (set ?: TreeSet(publicationsComparator)).apply { add(pub) }
             }
         }
 
@@ -32,12 +31,12 @@ public abstract class ReportPublicationsFlowAction : FlowAction<ReportPublicatio
     }
 
     private fun StyledTextOutput.report(publications: TreeMap<ReportPublication.Repository, TreeSet<ReportPublication>>) {
-        val header = withStyle(org.gradle.internal.logging.text.StyledTextOutput.Style.Header)
-        val description = withStyle(org.gradle.internal.logging.text.StyledTextOutput.Style.Description)
-        val identifier = withStyle(org.gradle.internal.logging.text.StyledTextOutput.Style.Identifier)
-        val info = withStyle(org.gradle.internal.logging.text.StyledTextOutput.Style.Info)
-        val failure = withStyle(org.gradle.internal.logging.text.StyledTextOutput.Style.Failure)
-        val failureHeader = withStyle(org.gradle.internal.logging.text.StyledTextOutput.Style.FailureHeader)
+        val header = withStyle(StyledTextOutput.Style.Header)
+        val description = withStyle(StyledTextOutput.Style.Description)
+        val identifier = withStyle(StyledTextOutput.Style.Identifier)
+        val info = withStyle(StyledTextOutput.Style.Info)
+        val failure = withStyle(StyledTextOutput.Style.Failure)
+        val failureHeader = withStyle(StyledTextOutput.Style.FailureHeader)
 
         println()
         publications.forEach { (repository, publications) ->
@@ -64,16 +63,13 @@ public abstract class ReportPublicationsFlowAction : FlowAction<ReportPublicatio
         }
     }
 
-    public interface Params : FlowParameters {
+    interface Params : FlowParameters {
 
         @get:Inject
-        public val styledTextOutputFactory: StyledTextOutputFactory
+        val styledTextOutputFactory: StyledTextOutputFactory
 
-        @get:Input
-        public val publications: MapProperty<String, ReportPublication>
-
-        @get:Input
-        public val outcomes: MapProperty<String, ReportPublication.Outcome>
+        @get:ServiceReference
+        val service: Property<ReportPublicationsService>
 
     }
 

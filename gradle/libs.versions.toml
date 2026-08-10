@@ -11,7 +11,7 @@ dokka = { id = "org.jetbrains.dokka-javadoc", version = "2.2.0" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version = "2.3.11" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-samReceiver = { id = "org.jetbrains.kotlin.plugin.sam.with.receiver", version.ref = "kotlin" }
-gitVersion = { id = "io.github.gmazzo.gitversion", version = "1.5.1" }
+gitVersion = { id = "io.github.gmazzo.gitversion", version = "1.6.1" }
 gradle-pluginPublish = { id = "com.gradle.plugin-publish", version = "2.1.1" }
 jacoco-testkit = { id = "io.github.gmazzo.gradle.testkit.jacoco", version = "1.1.0" }
 mavenPublish = { id = "com.vanniktech.maven.publish", version = "0.37.0" }
