@@ -1,5 +1,10 @@
+pluginManagement {
+    includeBuild("plugin")
+}
+
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+    id("io.github.gmazzo.publications.report")
 }
 
 dependencyResolutionManagement {
@@ -12,9 +17,8 @@ dependencyResolutionManagement {
 
 rootProject.name = "gradle-report-publications-plugin"
 
-includeBuild("plugin")
-
-include("demo")
+includeBuild("demo/build-conventions")
 includeBuild("demo/build-logic")
+include("demo")
 include("demo:module1")
 include("demo:module2")

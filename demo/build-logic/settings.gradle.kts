@@ -1,3 +1,11 @@
+pluginManagement {
+    includeBuild("../../plugin")
+}
+
+plugins {
+    id("io.github.gmazzo.publications.report")
+}
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -15,4 +23,4 @@ dependencyResolutionManagement {
     }
 }
 
-include("otherModule")
+includeBuild("../build-conventions")

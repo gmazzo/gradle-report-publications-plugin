@@ -2,16 +2,16 @@ package io.github.gmazzo.publications.report.spi
 
 import com.google.auto.service.AutoService
 import io.github.gmazzo.publications.report.ReportPublication
-import org.gradle.api.Task
 import org.gradle.api.publish.ivy.internal.publication.IvyPublicationInternal
 import org.gradle.api.publish.ivy.tasks.PublishToIvyRepository
 
 @AutoService(PublicationsCollector::class)
-internal class PublicationsIvyCollector : PublicationsCollector {
+internal class PublicationsIvyCollector : PublicationsCollector<PublishToIvyRepository> {
 
-    override fun collectPublications(task: Task): List<ReportPublication> {
-        if (task !is PublishToIvyRepository) return emptyList()
+    override val accepts =
+        PublishToIvyRepository::class.java
 
+    override fun collectPublications(task: PublishToIvyRepository): List<ReportPublication> {
         val repository = ReportPublication.Repository(
             name = task.repository.name,
             value = task.repository.url.toString()

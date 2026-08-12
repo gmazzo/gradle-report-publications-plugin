@@ -22,7 +22,11 @@ plugins {
 ```
 
 Then, whenever you call Maven Publish task (usually `publish` or `publishToMavenLocal`) on any project, the plugin will
-decorate the build logs showing maven coordinates (`GAV`):
+decorate the build logs showing maven coordinates (`GAV`).
+
+> [!NOTE]
+> On [Isolated Projects](https://docs.gradle.org/current/userguide/isolated_projects.html),
+> this plugin needs to be applied to at `settings.gradle.kts` or on every single project where is required.
 
 For instance, the `demo` project will print for `publishToMavenLocal`:
 
