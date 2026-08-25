@@ -1,11 +1,14 @@
 package io.github.gmazzo.publications.report
 
+import java.io.*
 import java.util.*
 import javax.inject.Inject
 import org.gradle.api.flow.FlowAction
 import org.gradle.api.flow.FlowParameters
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.services.ServiceReference
+import org.gradle.api.tasks.Input
 import org.gradle.internal.logging.text.StyledTextOutput
 import org.gradle.internal.logging.text.StyledTextOutputFactory
 
@@ -15,19 +18,41 @@ internal abstract class ReportPublicationsFlowAction : FlowAction<ReportPublicat
         compareBy(ReportPublication::groupId, ReportPublication::artifactId, ReportPublication::version)
 
     override fun execute(parameters: Params) {
-        val service = parameters.service.get()
-        val logger = parameters.styledTextOutputFactory.create(ReportPublication::class.java)
+        val publications = parameters.publications.get() as Map<String, List<Serializable>>
+        val outcomes = parameters.service.get().outcomes as Map<String, Enum<*>>
 
-        val publications =
+        val publicationsByRepo =
             TreeMap<ReportPublication.Repository, TreeSet<ReportPublication>>(compareBy(ReportPublication.Repository::value))
 
-        for (pub in service.collectPublications()) {
-            publications.compute(pub.repository) { _, set ->
-                (set ?: TreeSet(publicationsComparator)).apply { add(pub) }
+        for ((taskPath, pubs) in publications) {
+            val outcome = recreate(outcomes[taskPath]) ?: continue
+
+            for (pub in pubs) {
+                val pub = recreate(pub)
+
+                publicationsByRepo
+                    .getOrPut(pub.repository) { TreeSet(publicationsComparator) }
+                    .add(pub.copy(outcome = outcome))
             }
         }
 
-        logger.report(publications)
+        parameters.styledTextOutputFactory
+            .create(ReportPublication::class.java)
+            .report(publicationsByRepo)
+    }
+
+    private fun recreate(outcome: Enum<*>? /*ReportPublication.Outcome*/) = when (outcome) {
+        null -> null
+        is ReportPublication.Outcome -> outcome
+        else -> ReportPublication.Outcome.valueOf(outcome.name)
+    }
+
+    private fun recreate(publication: Serializable /*ReportPublication*/) = when (publication) {
+        is ReportPublication -> publication
+        else -> ByteArrayOutputStream().use { out ->
+            ObjectOutputStream(out).use { it.writeObject(publication) }
+            ObjectInputStream(ByteArrayInputStream(out.toByteArray())).use { it.readObject() as ReportPublication }
+        }
     }
 
     private fun StyledTextOutput.report(publications: TreeMap<ReportPublication.Repository, TreeSet<ReportPublication>>) {
@@ -55,18 +80,26 @@ internal abstract class ReportPublicationsFlowAction : FlowAction<ReportPublicat
                 text(":${it.artifactId}:")
                 info.text(it.version)
                 failure.text(it.artifacts.joinToString(prefix = " [", separator = ", ", postfix = "]"))
-                if (it.outcome != ReportPublication.Outcome.Published) {
-                    failureHeader.text(" (${it.outcome.name.lowercase()})")
-                }
+                it.outcome.displayName?.let { name -> failureHeader.text(" ($name)") }
                 println()
             }
         }
+    }
+
+    private val ReportPublication.Outcome?.displayName get() = when(this) {
+        ReportPublication.Outcome.Published -> null
+        ReportPublication.Outcome.Failed -> "failed"
+        ReportPublication.Outcome.Skipped -> "skipped"
+        null-> "not run"
     }
 
     interface Params : FlowParameters {
 
         @get:Inject
         val styledTextOutputFactory: StyledTextOutputFactory
+
+        @get:Input // this is intentionally redundant, to be able to recover them from Configuration Cache
+        val publications: MapProperty<String, List<ReportPublication>>
 
         @get:ServiceReference
         val service: Property<ReportPublicationsService>

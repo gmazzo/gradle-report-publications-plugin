@@ -46,7 +46,6 @@ gradlePlugin {
 }
 
 mavenPublishing {
-    signAllPublications()
     publishToMavenCentral(automaticRelease = true)
 
     pom {

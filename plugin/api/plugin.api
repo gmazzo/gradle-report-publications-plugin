@@ -1,5 +1,6 @@
 public final class io/github/gmazzo/publications/report/ReportPublication : java/io/Serializable {
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lio/github/gmazzo/publications/report/ReportPublication$Repository;Lio/github/gmazzo/publications/report/ReportPublication$Outcome;Ljava/util/List;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lio/github/gmazzo/publications/report/ReportPublication$Repository;Lio/github/gmazzo/publications/report/ReportPublication$Outcome;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Ljava/lang/String;
 	public final fun component2 ()Ljava/lang/String;
 	public final fun component3 ()Ljava/lang/String;
@@ -23,7 +24,6 @@ public final class io/github/gmazzo/publications/report/ReportPublication$Outcom
 	public static final field Failed Lio/github/gmazzo/publications/report/ReportPublication$Outcome;
 	public static final field Published Lio/github/gmazzo/publications/report/ReportPublication$Outcome;
 	public static final field Skipped Lio/github/gmazzo/publications/report/ReportPublication$Outcome;
-	public static final field Unknown Lio/github/gmazzo/publications/report/ReportPublication$Outcome;
 	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lio/github/gmazzo/publications/report/ReportPublication$Outcome;
 	public static fun values ()[Lio/github/gmazzo/publications/report/ReportPublication$Outcome;
@@ -52,7 +52,7 @@ public final class io/github/gmazzo/publications/report/ReportPublicationsPlugin
 }
 
 public abstract interface class io/github/gmazzo/publications/report/spi/PublicationsCollector {
+	public abstract fun accepts (Lorg/gradle/api/Task;)Z
 	public abstract fun collectPublications (Lorg/gradle/api/Task;)Ljava/util/List;
-	public abstract fun getAccepts ()Ljava/lang/Class;
 }
 

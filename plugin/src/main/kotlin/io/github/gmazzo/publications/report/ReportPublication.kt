@@ -7,12 +7,12 @@ public data class ReportPublication(
     val artifactId: String,
     val version: String,
     val repository: Repository,
-    val outcome: Outcome,
+    val outcome: Outcome? = null,
     val artifacts: List<String>,
 ) : Serializable {
 
     public data class Repository(val name: String, val value: String) : Serializable
 
-    public enum class Outcome { Published, Failed, Skipped, Unknown }
+    public enum class Outcome { Published, Failed, Skipped }
 
 }
