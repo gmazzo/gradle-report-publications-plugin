@@ -1,47 +1,55 @@
 package io.github.gmazzo.publications.report
 
-import io.github.gmazzo.publications.report.ReportPublicationsServiceImpl.Companion.wrap
-import java.io.Serializable
-import org.gradle.api.Project
-import org.gradle.api.Task
+import javax.inject.Inject
+import org.gradle.api.logging.Logging
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.MapProperty
+import org.gradle.api.services.BuildService
 import org.gradle.tooling.events.FinishEvent
 
-internal abstract class ReportPublicationsServiceReflected : ReportPublicationsService {
+internal abstract class ReportPublicationsServiceReflected @Inject constructor(
+    objects: ObjectFactory,
+) : ReportPublicationsServiceImpl(objects) {
 
-    private val delegate: Any = parameters.delegate.get()
+    private val logger =
+        Logging.getLogger(ReportPublicationsServiceReflected::class.java)
 
-    private val noteRegisteredImpl = delegate
-        .javaClass.getMethod("noteRegistered")
+    private val delegate =
+        parameters.delegate.get()
 
-    private val onConfigureImpl = delegate
-        .javaClass.getMethod("onConfigure", String::class.java, Project::class.java)
+    private val publicationsImpl = delegate.resolve("getPublications")
 
-    private val onTaskGraphImpl = delegate
-        .javaClass.getMethod("onTaskGraph", List::class.java)
+    private val outcomesImpl = delegate.resolve("getOutcomes")
 
-    private val onFinishImpl = delegate
-        .javaClass.getMethod("onFinish", FinishEvent::class.java)
+    private val noteRegisteredImpl = delegate.resolve("noteRegistered")
 
-    private val collectPublicationsImpl = delegate
-        .javaClass.getMethod("collectPublications")
-
-    override fun noteRegistered() =
-        noteRegisteredImpl.invoke(delegate) as Boolean
-
-    override fun onConfigure(buildPath: String, project: Project) {
-        onConfigureImpl(delegate, buildPath, project)
-    }
-
-    override fun onTaskGraph(allTasks: List<Task>) {
-        onTaskGraphImpl(delegate, allTasks)
-    }
-
-    override fun onFinish(event: FinishEvent) {
-        onFinishImpl(delegate, event)
-    }
+    private val onFinishImpl = delegate.resolve("onFinish", FinishEvent::class.java)
 
     @Suppress("UNCHECKED_CAST")
-    override fun collectPublications() =
-        (collectPublicationsImpl(delegate) as List<Serializable>).map(::wrap)
+    override val publications =
+        publicationsImpl?.invoke(delegate) as MapProperty<String, List<ReportPublication>>? ?: super.publications
+
+    @Suppress("UNCHECKED_CAST")
+    override val outcomes =
+        outcomesImpl?.invoke(delegate) as MutableMap<String, ReportPublication.Outcome>? ?: super.outcomes
+
+    override fun noteRegistered() =
+        noteRegisteredImpl?.invoke(delegate) as Boolean? ?: super.noteRegistered()
+
+    override fun onFinish(event: FinishEvent) {
+        onFinishImpl?.invoke(delegate, event) ?: super.onFinish(event)
+    }
+
+    private fun BuildService<*>.resolve(method: String, vararg args: Class<*>?) = try {
+        this@resolve.javaClass.getMethod(method, *args)
+
+    } catch (e: NoSuchMethodException) {
+        logger.warn(
+            "Failed to resolve method $method for ${this@resolve.javaClass}. " +
+                "This is usually caused by different plugins versions is the classpath",
+            e.takeIf { this@ReportPublicationsServiceReflected.parameters.verbose.get() },
+        )
+        null
+    }
 
 }

@@ -31,13 +31,13 @@ sealed class ReportPublicationsPluginTest(
 
         assertEquals(
             """
-            The following artifacts were published to localIvy(${rootDir.resolve("publish/build/repo/ivy/").toURI()}):
+            The following artifacts were published to localIvy(${rootDir.resolve("publish/build/repo/ivy").toURI().toString().removeSuffix("/")}):
              - io.gmazzo.demo:demo:0.1.0 [jar, xml, module, xml.asc, module.asc, jar.asc]
              - io.gmazzo.demo:module1:0.1.0 [jar, xml, module, xml.asc, module.asc, jar.asc]
              - io.gmazzo.demo:module2:0.1.0 [jar, xml, module]
              - io.gmazzo.demo.build-logic:build-logic:0.1.0 [jar, xml, module]
             The following artifacts were published to localMaven(${
-                rootDir.resolve("publish/build/repo/maven/").toURI()
+                rootDir.resolve("publish/build/repo/maven").toURI().toString().removeSuffix("/")
             }):
              - io.gmazzo.demo:demo:0.1.0 [jar, pom, module, pom.asc, module.asc, jar.asc]
              - io.gmazzo.demo:module1:0.1.0 [jar, pom, module, pom.asc, module.asc, jar.asc] (skipped)
@@ -75,14 +75,14 @@ sealed class ReportPublicationsPluginTest(
         assertEquals(
             """
             The following artifacts were published to localIvy(${
-                rootDir.resolve("publish-publishToMavenLocal/build/repo/ivy/").toURI()
+                rootDir.resolve("publish-publishToMavenLocal/build/repo/ivy").toURI().toString().removeSuffix("/")
             }):
              - io.gmazzo.demo:demo:0.1.0 [jar, xml, module, xml.asc, module.asc, jar.asc]
              - io.gmazzo.demo:module1:0.1.0 [jar, xml, module, xml.asc, module.asc, jar.asc]
              - io.gmazzo.demo:module2:0.1.0 [jar, xml, module]
              - io.gmazzo.demo.build-logic:build-logic:0.1.0 [jar, xml, module]
             The following artifacts were published to localMaven(${
-                rootDir.resolve("publish-publishToMavenLocal/build/repo/maven/").toURI()
+                rootDir.resolve("publish-publishToMavenLocal/build/repo/maven").toURI().toString().removeSuffix("/")
             }):
              - io.gmazzo.demo:demo:0.1.0 [jar, pom, module, pom.asc, module.asc, jar.asc]
              - io.gmazzo.demo:module1:0.1.0 [jar, pom, module, pom.asc, module.asc, jar.asc] (skipped)
