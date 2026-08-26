@@ -16,6 +16,8 @@ internal interface ReportPublicationsService :
     BuildService<ReportPublicationsService.Params>,
     OperationCompletionListener {
 
+    val isFullyConfigured: Boolean
+
     val publications: MapProperty<String, List<ReportPublication>>
 
     val outcomes: Map<String, ReportPublication.Outcome>

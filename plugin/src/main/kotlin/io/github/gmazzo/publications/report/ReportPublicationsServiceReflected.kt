@@ -25,6 +25,12 @@ internal abstract class ReportPublicationsServiceReflected @Inject constructor(
 
     private val onFinishImpl = delegate.resolve("onFinish", FinishEvent::class.java)
 
+    override val isFullyConfigured =
+        publicationsImpl != null &&
+            outcomesImpl != null &&
+            noteRegisteredImpl != null &&
+            onFinishImpl != null
+
     @Suppress("UNCHECKED_CAST")
     override val publications =
         publicationsImpl?.invoke(delegate) as MapProperty<String, List<ReportPublication>>? ?: super.publications

@@ -14,6 +14,8 @@ internal abstract class ReportPublicationsServiceImpl @Inject constructor(
 
     private val registered = AtomicBoolean()
 
+    override val isFullyConfigured = true
+
     override val publications = objects
         .mapProperty<String, List<ReportPublication>>()
         .apply { finalizeValueOnRead() }
