@@ -1,5 +1,6 @@
 package io.github.gmazzo.publications.report
 
+import java.lang.reflect.Method
 import javax.inject.Inject
 import org.gradle.api.logging.Logging
 import org.gradle.api.model.ObjectFactory
@@ -17,19 +18,54 @@ internal abstract class ReportPublicationsServiceReflected @Inject constructor(
     private val delegate =
         parameters.delegate.get()
 
-    private val publicationsImpl = delegate.resolve("getPublications")
+    private val publicationsImpl: Method?
 
-    private val outcomesImpl = delegate.resolve("getOutcomes")
+    private val outcomesImpl: Method?
 
-    private val noteRegisteredImpl = delegate.resolve("noteRegistered")
+    private val noteRegisteredImpl: Method?
 
-    private val onFinishImpl = delegate.resolve("onFinish", FinishEvent::class.java)
+    private val onFinishImpl: Method?
 
-    override val isFullyConfigured =
-        publicationsImpl != null &&
+    private val allImpsFound: Boolean
+
+    init {
+        fun BuildService<*>.resolve(method: String, vararg args: Class<*>?) = try {
+            this@resolve.javaClass.getMethod(method, *args)
+
+        } catch (e: NoSuchMethodException) {
+            logger.warn(
+                "Failed to resolve method $method for ${this@resolve.javaClass}. " +
+                    "This is usually caused by different plugins versions is the classpath",
+                e.takeIf { this@ReportPublicationsServiceReflected.parameters.verbose.get() },
+            )
+            null
+        }
+
+        val publicationsImpl = delegate.resolve("getPublications")
+        val outcomesImpl = delegate.resolve("getOutcomes")
+        val noteRegisteredImpl = delegate.resolve("noteRegistered")
+        val onFinishImpl = delegate.resolve("onFinish", FinishEvent::class.java)
+
+        allImpsFound = publicationsImpl != null &&
             outcomesImpl != null &&
             noteRegisteredImpl != null &&
             onFinishImpl != null
+
+        if (allImpsFound) {
+            this.publicationsImpl = publicationsImpl
+            this.outcomesImpl = outcomesImpl
+            this.noteRegisteredImpl = noteRegisteredImpl
+            this.onFinishImpl = onFinishImpl
+
+        } else {
+            this.publicationsImpl = null
+            this.outcomesImpl = null
+            this.noteRegisteredImpl = null
+            this.onFinishImpl = null
+        }
+    }
+
+    override val isFullyConfigured = allImpsFound
 
     @Suppress("UNCHECKED_CAST")
     override val publications =
@@ -44,18 +80,6 @@ internal abstract class ReportPublicationsServiceReflected @Inject constructor(
 
     override fun onFinish(event: FinishEvent) {
         onFinishImpl?.invoke(delegate, event) ?: super.onFinish(event)
-    }
-
-    private fun BuildService<*>.resolve(method: String, vararg args: Class<*>?) = try {
-        this@resolve.javaClass.getMethod(method, *args)
-
-    } catch (e: NoSuchMethodException) {
-        logger.warn(
-            "Failed to resolve method $method for ${this@resolve.javaClass}. " +
-                "This is usually caused by different plugins versions is the classpath",
-            e.takeIf { this@ReportPublicationsServiceReflected.parameters.verbose.get() },
-        )
-        null
     }
 
 }
