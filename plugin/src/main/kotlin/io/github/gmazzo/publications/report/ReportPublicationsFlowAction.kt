@@ -18,8 +18,9 @@ internal abstract class ReportPublicationsFlowAction : FlowAction<ReportPublicat
         compareBy(ReportPublication::groupId, ReportPublication::artifactId, ReportPublication::version)
 
     override fun execute(parameters: Params) {
+        val service = parameters.service.get()
         val publications = parameters.publications.get() as Map<String, List<Serializable>>
-        val outcomes = parameters.service.get().outcomes as Map<String, Enum<*>>
+        val outcomes = service.outcomes as Map<String, Enum<*>>
 
         val publicationsByRepo =
             TreeMap<ReportPublication.Repository, TreeSet<ReportPublication>>(compareBy(ReportPublication.Repository::value))
@@ -38,7 +39,7 @@ internal abstract class ReportPublicationsFlowAction : FlowAction<ReportPublicat
 
         parameters.styledTextOutputFactory
             .create(ReportPublication::class.java)
-            .report(publicationsByRepo)
+            .report(publicationsByRepo, mayHaveMissingDisclaimer = !service.isFullyConfigured)
     }
 
     private fun recreate(outcome: Enum<*>? /*ReportPublication.Outcome*/) = when (outcome) {
@@ -55,7 +56,10 @@ internal abstract class ReportPublicationsFlowAction : FlowAction<ReportPublicat
         }
     }
 
-    private fun StyledTextOutput.report(publications: TreeMap<ReportPublication.Repository, TreeSet<ReportPublication>>) {
+    private fun StyledTextOutput.report(
+        publications: TreeMap<ReportPublication.Repository, TreeSet<ReportPublication>>,
+        mayHaveMissingDisclaimer: Boolean
+    ) {
         val header = withStyle(StyledTextOutput.Style.Header)
         val description = withStyle(StyledTextOutput.Style.Description)
         val identifier = withStyle(StyledTextOutput.Style.Identifier)
@@ -84,14 +88,18 @@ internal abstract class ReportPublicationsFlowAction : FlowAction<ReportPublicat
                 println()
             }
         }
+        if (mayHaveMissingDisclaimer) {
+            info.println("(some publications from included builds may be missing due classpath conflicts)")
+        }
     }
 
-    private val ReportPublication.Outcome?.displayName get() = when(this) {
-        ReportPublication.Outcome.Published -> null
-        ReportPublication.Outcome.Failed -> "failed"
-        ReportPublication.Outcome.Skipped -> "skipped"
-        null-> "not run"
-    }
+    private val ReportPublication.Outcome?.displayName
+        get() = when (this) {
+            ReportPublication.Outcome.Published -> null
+            ReportPublication.Outcome.Failed -> "failed"
+            ReportPublication.Outcome.Skipped -> "skipped"
+            null -> "not run"
+        }
 
     interface Params : FlowParameters {
 
