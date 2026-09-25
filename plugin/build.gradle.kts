@@ -1,5 +1,6 @@
 @file:OptIn(ExperimentalAbiValidation::class)
 
+import org.gradle.plugin.compatibility.compatibility
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 
 plugins {
@@ -10,6 +11,7 @@ plugins {
     alias(libs.plugins.mavenPublish)
     alias(libs.plugins.gitVersion)
     alias(libs.plugins.gradle.pluginPublish)
+    alias(libs.plugins.gradle.pluginCompatibility)
     alias(libs.plugins.jacoco.testkit)
     id("io.github.gmazzo.publications.report") version "+" // self reference to latest published, for reporting this one
 }
@@ -40,6 +42,12 @@ gradlePlugin {
             displayName = name
             implementationClass = "io.github.gmazzo.publications.report.ReportPublicationsPlugin"
             description = project.description
+            compatibility {
+                features {
+                    configurationCache = true
+                    isolatedProjects = true
+                }
+            }
             tags.addAll("maven", "publication", "maven-publish", "report")
         }
     }
